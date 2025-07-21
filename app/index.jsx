@@ -1,274 +1,398 @@
-import React, { useState } from "react";
+import React from 'react';
 import {
-  Alert,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Platform,
   View,
-  useColorScheme,
-} from "react-native";
+  Text,
+  ScrollView,
+  StyleSheet,
+  StatusBar,
+  TouchableOpacity,
+  SafeAreaView,
+  ImageBackground,
+  LinearGradient,
+} from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 
-export default function Index() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-  
-  const [form, setForm] = useState({
-    name: "",
-    gravida: "",
-    previousCSections: "no",
-    age: "",
-    height: "",
-    bloodPressure: "",
-    bloodSugar: "",
-    fetalPosition: "unknown",
-  });
+const DoctorDashboard = () => {
+  const doctorName = "Saba Ansari"; // This would come from props or state
 
-  const updateForm = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
+  const dashboardCards = [
+    {
+      id: 1,
+      title: 'Predict Delivery Mode',
+      description: 'AI-powered delivery predictions',
+      icon: 'baby-face-outline',
+      gradientColors: ['rgba(236, 72, 153, 0.3)', 'rgba(219, 39, 119, 0.2)'],
+      iconColor: '#F8BBD9',
+    },
+    {
+      id: 2,
+      title: 'Chat — View Your Patients',
+      description: 'Monitor patient conversations',
+      icon: 'chat-outline',
+      gradientColors: ['rgba(168, 85, 247, 0.3)', 'rgba(139, 69, 219, 0.2)'],
+      iconColor: '#DDD6FE',
+    },
+    {
+      id: 3,
+      title: 'Appointments — Schedule',
+      description: 'Manage your appointments',
+      icon: 'calendar-clock',
+      gradientColors: ['rgba(219, 39, 119, 0.3)', 'rgba(190, 24, 93, 0.2)'],
+      iconColor: '#FBBF24',
+    },
+    {
+      id: 4,
+      title: 'Chats — Patients Chatting With You',
+      description: 'Active patient communications',
+      icon: 'message-reply-text',
+      gradientColors: ['rgba(147, 51, 234, 0.3)', 'rgba(126, 34, 206, 0.2)'],
+      iconColor: '#C4B5FD',
+    },
+  ];
 
-  const handleSubmit = () => {
-    const data = {
-      ...form,
-      gravida: Number(form.gravida),
-      age: Number(form.age),
-      height: Number(form.height),
-      bloodSugar: Number(form.bloodSugar),
-      previous_c_sections: form.previousCSections === "yes",
-    };
-    
-    Alert.alert("Form Submitted", JSON.stringify(data, null, 2));
+  const handleCardPress = (cardTitle) => {
+    console.log(`${cardTitle} card pressed`);
+    // Navigate to respective screen
   };
 
-  const styles = createStyles(isDark);
+  const GlassCard = ({ children, style }) => (
+    <View style={[styles.glassCard, style]}>
+      <View style={styles.glassEffect}>
+        {children}
+      </View>
+    </View>
+  );
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView 
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          <Text style={styles.title}>Patient Info</Text>
+    <View style={styles.container}>
+      <StatusBar backgroundColor="#1A0B2E" barStyle="light-content" />
+      
+      {/* Background Gradient */}
+      <View style={styles.backgroundGradient}>
+        <View style={styles.gradientLayer1} />
+        <View style={styles.gradientLayer2} />
+        <View style={styles.gradientLayer3} />
+      </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Name"
-            value={form.name}
-            onChangeText={(value) => updateForm('name', value)}
-            returnKeyType="next"
-            blurOnSubmit={false}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Gravida"
-            value={form.gravida}
-            onChangeText={(value) => updateForm('gravida', value)}
-            keyboardType="numeric"
-            returnKeyType="next"
-            blurOnSubmit={false}
-          />
-
-          <Text style={styles.label}>Previous C-Sections</Text>
-          <View style={styles.toggleContainer}>
-            <TouchableOpacity
-              style={[
-                styles.toggleButton,
-                form.previousCSections === "no" && styles.toggleButtonActive
-              ]}
-              onPress={() => updateForm('previousCSections', 'no')}
-            >
-              <Text style={[
-                styles.toggleText,
-                form.previousCSections === "no" && styles.toggleTextActive
-              ]}>No</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.toggleButton,
-                form.previousCSections === "yes" && styles.toggleButtonActive
-              ]}
-              onPress={() => updateForm('previousCSections', 'yes')}
-            >
-              <Text style={[
-                styles.toggleText,
-                form.previousCSections === "yes" && styles.toggleTextActive
-              ]}>Yes</Text>
-            </TouchableOpacity>
-          </View>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Age"
-            value={form.age}
-            onChangeText={(value) => updateForm('age', value)}
-            keyboardType="numeric"
-            returnKeyType="next"
-            blurOnSubmit={false}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Height (cm)"
-            value={form.height}
-            onChangeText={(value) => updateForm('height', value)}
-            keyboardType="numeric"
-            returnKeyType="next"
-            blurOnSubmit={false}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Blood Pressure (120/80)"
-            value={form.bloodPressure}
-            onChangeText={(value) => updateForm('bloodPressure', value)}
-            returnKeyType="next"
-            blurOnSubmit={false}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Blood Sugar (fasting)"
-            value={form.bloodSugar}
-            onChangeText={(value) => updateForm('bloodSugar', value)}
-            keyboardType="numeric"
-            returnKeyType="done"
-          />
-
-          <Text style={styles.label}>Fetal Position</Text>
-          <View style={styles.segmentContainer}>
-            {['unknown', 'cephalic', 'breech'].map((position) => (
-              <TouchableOpacity
-                key={position}
-                style={[
-                  styles.segmentButton,
-                  form.fetalPosition === position && styles.segmentButtonActive
-                ]}
-                onPress={() => updateForm('fetalPosition', position)}
+      {/* Top Toolbar */}
+      <SafeAreaView>
+        <View style={styles.toolbar}>
+          <View style={styles.toolbarContent}>
+            <Text style={styles.toolbarTitle}>GyneAI Dashboard</Text>
+            <View style={styles.toolbarActions}>
+              <TouchableOpacity 
+                style={styles.toolbarAction}
+                onPress={() => console.log('Notifications pressed')}
               >
-                <Text style={[
-                  styles.segmentText,
-                  form.fetalPosition === position && styles.segmentTextActive
-                ]}>
-                  {position.charAt(0).toUpperCase() + position.slice(1)}
-                </Text>
+                <MaterialCommunityIcons name="bell-outline" size={24} color="#F8BBD9" />
               </TouchableOpacity>
-            ))}
+              <TouchableOpacity 
+                style={styles.toolbarAction}
+                onPress={() => console.log('Profile pressed')}
+              >
+                <MaterialCommunityIcons name="account-circle" size={24} color="#F8BBD9" />
+              </TouchableOpacity>
+            </View>
           </View>
+        </View>
+      </SafeAreaView>
 
-          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+      <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        {/* Welcome Section */}
+        <View style={styles.welcomeSection}>
+          <View style={styles.glassEffect}>
+            <View style={styles.welcomeContent}>
+              <View style={styles.avatarContainer}>
+                <View style={styles.avatarGlow}>
+                  <MaterialCommunityIcons name="doctor" size={40} color="#F8BBD9" />
+                </View>
+              </View>
+              <View style={styles.welcomeText}>
+                <Text style={styles.welcomeTitle}>
+                  Welcome, Dr. {doctorName}
+                </Text>
+                <Text style={styles.welcomeSubtitle}>
+                  Caring for women's health with compassion
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Dashboard Cards */}
+        <View style={styles.cardsContainer}>
+          {dashboardCards.map((card) => (
+            <TouchableOpacity
+              key={card.id}
+              onPress={() => handleCardPress(card.title)}
+              activeOpacity={0.8}
+            >
+              <View style={styles.card}>
+                <View style={styles.glassEffect}>
+                  <View style={styles.cardContent}>
+                    <View style={styles.cardHeader}>
+                      <View style={styles.iconContainer}>
+                        <View style={styles.iconGlow}>
+                          <MaterialCommunityIcons
+                            name={card.icon}
+                            size={32}
+                            color={card.iconColor}
+                          />
+                        </View>
+                      </View>
+                      <MaterialCommunityIcons
+                        name="chevron-right"
+                        size={24}
+                        color="rgba(248, 187, 217, 0.7)"
+                      />
+                    </View>
+                    <Text style={styles.cardTitle} numberOfLines={2}>
+                      {card.title}
+                    </Text>
+                    <Text style={styles.cardDescription} numberOfLines={2}>
+                      {card.description}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <View style={styles.bottomPadding} />
+      </ScrollView>
+    </View>
   );
-}
+};
 
-const createStyles = (isDark) => StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: isDark ? "#1a1a1a" : "#f8f9fa",
+    backgroundColor: '#0D001A',
   },
-  content: {
-    padding: 20,
-    paddingTop: 60,
+
+  // Background Gradient Layers
+  backgroundGradient: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#1A0B2E',
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    textAlign: "center",
-    color: isDark ? "#ffffff" : "#2c3e50",
-    marginBottom: 30,
+  gradientLayer1: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#0D001A',
   },
-  input: {
-    backgroundColor: isDark ? "#2d2d2d" : "#fff",
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 16,
+  gradientLayer2: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#1A0B2E',
+    opacity: 0.8,
+  },
+  gradientLayer3: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#2D1B69',
+    opacity: 0.3,
+  },
+
+  // Glass Effect Components
+  glassCard: {
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderWidth: 1,
-    borderColor: isDark ? "#404040" : "#e1e8ed",
-    fontSize: 16,
-    color: isDark ? "#ffffff" : "#000000",
+    borderColor: 'rgba(248, 187, 217, 0.15)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: isDark ? "#e0e0e0" : "#34495e",
+  glassEffect: {
+    backgroundColor: 'rgba(26, 11, 46, 0.4)',
+    borderRadius: 19,
+  },
+
+  // Toolbar Styles
+  toolbar: {
+    marginHorizontal: 16,
+    marginTop: 16,
     marginBottom: 8,
-  },
-  toggleContainer: {
-    flexDirection: "row",
-    marginBottom: 16,
-    borderRadius: 12,
-    backgroundColor: isDark ? "#2d2d2d" : "#fff",
+    backgroundColor: 'rgba(26, 11, 46, 0.7)',
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: isDark ? "#404040" : "#e1e8ed",
-    overflow: "hidden",
+    borderColor: 'rgba(248, 187, 217, 0.2)',
+    shadowColor: '#EC4899',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  toggleButton: {
+  toolbarContent: {
+    height: 56,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  toolbarTitle: {
     flex: 1,
-    paddingVertical: 15,
-    backgroundColor: isDark ? "#2d2d2d" : "#fff",
-    alignItems: "center",
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#F8BBD9',
+    textShadowColor: 'rgba(236, 72, 153, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 10,
   },
-  toggleButtonActive: {
-    backgroundColor: "#3498db",
+  toolbarActions: {
+    flexDirection: 'row',
   },
-  toggleText: {
+  toolbarAction: {
+    width: 48,
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 24,
+    marginLeft: 8,
+    backgroundColor: 'rgba(248, 187, 217, 0.1)',
+  },
+
+  // Scroll Container
+  scrollContainer: {
+    flex: 1,
+  },
+
+  // Welcome Section Styles
+  welcomeSection: {
+    margin: 16,
+    marginTop: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(248, 187, 217, 0.15)',
+    shadowColor: '#EC4899',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  welcomeContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 24,
+  },
+  avatarContainer: {
+    marginRight: 20,
+  },
+  avatarGlow: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(236, 72, 153, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(248, 187, 217, 0.3)',
+    shadowColor: '#EC4899',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 15,
+  },
+  welcomeText: {
+    flex: 1,
+  },
+  welcomeTitle: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#F8BBD9',
+    marginBottom: 6,
+    textShadowColor: 'rgba(236, 72, 153, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 8,
+  },
+  welcomeSubtitle: {
     fontSize: 16,
-    fontWeight: "600",
-    color: isDark ? "#b0b0b0" : "#7f8c8d",
+    color: 'rgba(221, 214, 254, 0.8)',
+    lineHeight: 22,
   },
-  toggleTextActive: {
-    color: "#fff",
+
+  // Cards Styles
+  cardsContainer: {
+    padding: 16,
+    paddingTop: 8,
   },
-  segmentContainer: {
-    flexDirection: "row",
-    marginBottom: 16,
-    borderRadius: 12,
-    backgroundColor: isDark ? "#2d2d2d" : "#fff",
+  card: {
+    marginBottom: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: isDark ? "#404040" : "#e1e8ed",
-    overflow: "hidden",
+    borderColor: 'rgba(248, 187, 217, 0.15)',
+    shadowColor: '#A855F7',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  segmentButton: {
-    flex: 1,
-    paddingVertical: 15,
-    backgroundColor: isDark ? "#2d2d2d" : "#fff",
-    alignItems: "center",
+  cardGradient: {
+    backgroundColor: 'rgba(147, 51, 234, 0.15)',
   },
-  segmentButtonActive: {
-    backgroundColor: "#3498db",
+  cardContent: {
+    padding: 24,
   },
-  segmentText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: isDark ? "#b0b0b0" : "#7f8c8d",
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
   },
-  segmentTextActive: {
-    color: "#fff",
+  iconContainer: {
+    shadowColor: '#A855F7',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 15,
   },
-  button: {
-    backgroundColor: "#3498db",
-    paddingVertical: 16,
-    borderRadius: 12,
-    marginTop: 20,
-    marginBottom: 30,
+  iconGlow: {
+    width: 72,
+    height: 72,
+    borderRadius: 20,
+    backgroundColor: 'rgba(168, 85, 247, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(221, 214, 254, 0.2)',
   },
-  buttonText: {
-    textAlign: "center",
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 18,
+  cardTitle: {
+    fontSize: 19,
+    fontWeight: '700',
+    color: '#F8BBD9',
+    marginBottom: 10,
+    textShadowColor: 'rgba(236, 72, 153, 0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 5,
+  },
+  cardDescription: {
+    fontSize: 15,
+    color: 'rgba(221, 214, 254, 0.8)',
+    lineHeight: 22,
+  },
+  bottomPadding: {
+    height: 30,
   },
 });
+
+export default DoctorDashboard;
