@@ -1,26 +1,25 @@
-// Index.jsx
 import React from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import Background from './components/Background';
 import Navbar from './components/Navbar';
 import Cards from './components/cards';
-import { Alert } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
+import DashBoard from './DoctorScreens/DashBoard';
 
 const Index = () => {
   return (
-    <View className="flex-1">
-      <Background />
+    <View className="flex-1 bg-white">
       <Navbar />
-      
-      <View className="flex-1 justify-center items-center px-4 mt-32">
-        <Cards Title="Predict Delivery Mode"Description="Use this tool to predict the most likely delivery method for your patient."  onPress={() =>console.log("Navigation to the model")}/>
-        <View style={{ height: 24 }} />
-        <Cards Title="Appointment Booking"Description="You can check your appointments here."  onPress={() =>console.log("Navigation to the Appointments")}/>
-        <View style={{ height: 24 }} />
-        <Cards Title="Patients History"Description="Chat and interact with your patient."  onPress={() =>console.log("Navigation to the Patients History")}/>
-        <View style={{height:24}}/>
-        <Cards Title="Patient's Medical Records" Description="Check the medical records of your patients here. You can also chat with them." onPress={() =>router.push('/patients')}/>
+
+      <View className="flex items-center justify-center mt-96">
+        <TouchableOpacity onPress={() => router.push('/DoctorScreens/DashBoard')} className="h-16 w-10/12 bg-purple-500 rounded-md items-center justify-center">
+          <Text className="text-xl text-white font-bold">Doctor</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => router.push('/PatientsScreens/Dashboard')} className="h-16 w-10/12 bg-purple-500 rounded-md items-center justify-center mt-6">
+          <Text className="text-xl text-white font-bold">Patients</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
