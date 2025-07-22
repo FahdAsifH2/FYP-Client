@@ -5,6 +5,7 @@ import Background from './components/Background';
 import Navbar from './components/Navbar';
 import Cards from './components/cards';
 import { Alert } from 'react-native';
+import { router } from 'expo-router';
 
 const Index = () => {
   return (
@@ -19,7 +20,7 @@ const Index = () => {
         <View style={{ height: 24 }} />
         <Cards Title="Patients History"Description="Chat and interact with your patient."  onPress={() =>console.log("Navigation to the Patients History")}/>
         <View style={{height:24}}/>
-        <Cards Title="Patient's Medical Records" Description="Check the medical records of your patients here. You can also chat with them." onPress={() =>console.log("Navigation to the Patients Records")}/>
+        <Cards Title="Patient's Medical Records" Description="Check the medical records of your patients here. You can also chat with them." onPress={() =>router.push('/patients')}/>
       </View>
     </View>
   );
