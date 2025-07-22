@@ -6,6 +6,7 @@ import Cards from '../components/cards';
 import { Alert } from 'react-native';
 import { router } from 'expo-router';
 import Patients from './Patients';
+import Footer from '../components/Footer';
 const Dashboard = () => {
   return (
     <View className="flex-1">
@@ -37,6 +38,8 @@ const Dashboard = () => {
           onPress={() => router.push('/DoctorScreens/Patients')}
         />
       </View>
+
+      <Footer/>
     </View>
   );
 };

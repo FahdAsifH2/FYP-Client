@@ -4,6 +4,7 @@ import axios from 'axios'
 import Navbar from '../components/Navbar'
 import { TouchableOpacity } from 'react-native'
 import Background from '../components/Background';
+import Footer from '../components/Footer'
 const Patients = () => {
   const [patients, setPatients] = useState([])
 
@@ -39,7 +40,8 @@ const Patients = () => {
     </View>
   )}
 />
-
+   
+<Footer className='pt-16'/>
     </View>
   )
 }
