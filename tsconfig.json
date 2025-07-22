@@ -2,7 +2,7 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "module": "esnext",               // ✅ Fixed: Changed from "es2020" to "esnext"
+    "module": "es2020",                 // ✅ Fixed here
     "jsx": "react-native",
     "baseUrl": ".",
     "paths": {
