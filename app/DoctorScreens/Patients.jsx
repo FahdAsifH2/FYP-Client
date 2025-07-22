@@ -2,7 +2,8 @@ import { FlatList, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import Navbar from '../components/Navbar'
-
+import { TouchableOpacity } from 'react-native'
+import Background from '../components/Background';
 const Patients = () => {
   const [patients, setPatients] = useState([])
 
@@ -19,22 +20,26 @@ const Patients = () => {
   return (
     <View className="flex-1 bg-white px-4 pt-10">
       <Navbar />
-
+      <Background/>
       <Text className="text-4xl font-bold text-purple-500 text-center mt-24 mb-6">
         PATIENTS
       </Text>
-
       <FlatList
-        data={patients}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        renderItem={({ item }) => (
-          <View className="bg-purple-200 px-4 py-3 rounded-xl mb-3 mx-auto w-full max-w-[90%]">
-            <Text className="text-lg text-gray-800 font-medium">{item.name}</Text>
-            
-          </View>
-        )}
-      />
+  data={patients}
+  keyExtractor={(_, i) => i.toString()}
+  contentContainerStyle={{ paddingBottom: 20 }}
+  renderItem={({ item }) => (
+    <View className="bg-purple-300 p-4 rounded-xl mb-3 mx-auto w-[90%] flex-row items-center">
+      <Text className="text-xl font-medium text-gray-800">{item.name}</Text>
+    
+      <TouchableOpacity className="ml-auto bg-red-500 px-3 py-1.5 rounded">
+        <Text className="text-white">Details</Text>
+      </TouchableOpacity>
+
+    </View>
+  )}
+/>
+
     </View>
   )
 }
