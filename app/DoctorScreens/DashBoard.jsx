@@ -5,7 +5,7 @@ import Navbar from '../components/Navbar';
 import Cards from '../components/cards';
 import { Alert } from 'react-native';
 import { router } from 'expo-router';
-
+import Patients from './Patients';
 const Dashboard = () => {
   return (
     <View className="flex-1">
@@ -34,7 +34,7 @@ const Dashboard = () => {
         <Cards 
           Title="Patient's Medical Records"
           Description="Check the medical records of your patients here. You can also chat with them."
-          onPress={() => router.push('/patients')}
+          onPress={() => router.push('/DoctorScreens/Patients')}
         />
       </View>
     </View>
