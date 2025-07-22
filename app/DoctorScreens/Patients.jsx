@@ -19,8 +19,11 @@ const Patients = () => {
   return (
     <View className="flex-1 bg-white p-4 ">
      <Navbar/>
-
-      <Text className="text-2xl font-bold mb-4 text-gray-800 mt-28">Patients</Text>
+     
+    <View className='flex items-center'>
+    <Text className="text-4xl font-bold mb-4 text-purple-400 mt-28">PATIENTS</Text>
+    </View>
+     
       <FlatList
         data={patients}
         keyExtractor={(item, index) => index.toString()}
