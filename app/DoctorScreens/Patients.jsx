@@ -17,19 +17,21 @@ const Patients = () => {
   }, [])
 
   return (
-    <View className="flex-1 bg-white p-4 ">
-     <Navbar/>
-     
-    <View className='flex items-center'>
-    <Text className="text-4xl font-bold mb-4 text-purple-400 mt-28">PATIENTS</Text>
-    </View>
-     
+    <View className="flex-1 bg-white px-4 pt-10">
+      <Navbar />
+
+      <Text className="text-4xl font-bold text-purple-500 text-center mt-24 mb-6">
+        PATIENTS
+      </Text>
+
       <FlatList
         data={patients}
         keyExtractor={(item, index) => index.toString()}
+        contentContainerStyle={{ paddingBottom: 20 }}
         renderItem={({ item }) => (
-          <View className="bg-purple-300 p-3 rounded-lg mb-2">
-            <Text className="text-base text-gray-700">{item.name}</Text>
+          <View className="bg-purple-200 px-4 py-3 rounded-xl mb-3 mx-auto w-full max-w-[90%]">
+            <Text className="text-lg text-gray-800 font-medium">{item.name}</Text>
+            
           </View>
         )}
       />
