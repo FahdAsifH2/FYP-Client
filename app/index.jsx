@@ -6,9 +6,12 @@ import Cards from './components/cards';
 import { TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import DashBoard from './DoctorScreens/DashBoard';
+import Footer from './components/Footer';
 
 const Index = () => {
+
   return (
+
     <View className="flex-1 bg-white">
       <Navbar />
 
@@ -21,6 +24,8 @@ const Index = () => {
           <Text className="text-xl text-white font-bold">Patients</Text>
         </TouchableOpacity>
       </View>
+
+      <Footer/>
     </View>
   );
 };
