@@ -6,6 +6,7 @@ import Cards from './components/cards';
 import { TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import DashBoard from './DoctorScreens/DashBoard';
+import {PatientsDashBoard} from './PatientScreens/PatientsDashBoard'
 import Footer from './components/Footer';
 
 const Index = () => {
@@ -20,7 +21,7 @@ const Index = () => {
           <Text className="text-xl text-white font-bold">Doctor</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push('/PatientScreens/Form')} className="h-16 w-10/12 bg-purple-500 rounded-md items-center justify-center mt-6">
+        <TouchableOpacity onPress={() => router.push('/PatientScreens/PatientsDashBoard')} className="h-16 w-10/12 bg-purple-500 rounded-md items-center justify-center mt-6">
           <Text className="text-xl text-white font-bold">Patients</Text>
         </TouchableOpacity>
       </View>

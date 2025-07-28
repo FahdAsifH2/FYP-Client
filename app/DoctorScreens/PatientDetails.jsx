@@ -84,7 +84,7 @@ const PatientDetails = () => {
   }
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-purple-300">
       <Navbar />
       <Background />
       
@@ -97,7 +97,7 @@ const PatientDetails = () => {
         </Text>
 
       
-        <View className="bg-purple-100 rounded-xl p-6 mb-6 mx-2">
+        <View className="bg-purple-200 rounded-xl p-6 mb-6 mx-2">
           <Text className="text-2xl font-bold text-gray-800 mb-4 text-center">
             {patient.name || 'N/A'}
           </Text>
