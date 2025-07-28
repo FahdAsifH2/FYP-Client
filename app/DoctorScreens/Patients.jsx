@@ -12,7 +12,7 @@ const Patients = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    axios.get('http://192.168.31.188:5001/api/patients/getPatientsNames')
+    axios.get('http://192.168.31.188:5001/api/Doctors/getPatientsNames')
       .then(res => {
         setPatients(res.data.data)
         setLoading(false)

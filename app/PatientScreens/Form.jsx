@@ -67,7 +67,7 @@ const Form = () => {
 
     try {
       const response = await axios.post(
-        "http://192.168.31.188:5001/api/patients/putPatients", // 👈 Replace IP if needed
+        "http://192.168.31.188:5001/api/patients/putPatients",
         apiPayload
       );
 
