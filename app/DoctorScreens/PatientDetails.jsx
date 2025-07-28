@@ -103,48 +103,48 @@ const PatientDetails = () => {
           </Text>
           
           <View className="space-y-3">
-            <View className="bg-white rounded-lg p-4">
+            <View >
               <Text className="text-lg font-semibold text-purple-600">Patient ID:</Text>
               <Text className="text-lg text-gray-800">{patient.id || id}</Text>
             </View>
 
             {patient.age && (
-              <View className="bg-white rounded-lg p-4">
+              <View >
                 <Text className="text-lg font-semibold text-purple-600">Age:</Text>
                 <Text className="text-lg text-gray-800">{patient.age}</Text>
               </View>
             )}
 
             {patient.gravida && (
-              <View className="bg-white rounded-lg p-4">
+              <View >
                 <Text className="text-lg font-semibold text-purple-600">Gravida:</Text>
                 <Text className="text-lg text-gray-800">{patient.gravida}</Text>
               </View>
             )}
 
             {patient.blood_pressure && (
-              <View className="bg-white rounded-lg p-4">
+              <View >
                 <Text className="text-lg font-semibold text-purple-600">Blood Pressure:</Text>
                 <Text className="text-lg text-gray-800">{patient.blood_pressure}</Text>
               </View>
             )}
 
             {patient.height && (
-              <View className="bg-white rounded-lg p-4">
+              <View >
                 <Text className="text-lg font-semibold text-purple-600">Height:</Text>
                 <Text className="text-lg text-gray-800">{patient.height}</Text>
               </View>
             )}
 
             {patient.diabetes !== undefined && (
-              <View className="bg-white rounded-lg p-4">
+              <View>
                 <Text className="text-lg font-semibold text-purple-600">Diabetes:</Text>
                 <Text className="text-lg text-gray-800">{patient.diabetes ? 'Yes' : 'No'}</Text>
               </View>
             )}
 
             {patient.previous_c_section !== undefined && (
-              <View className="bg-white rounded-lg p-4">
+              <View >
                 <Text className="text-lg font-semibold text-purple-600">Previous C-Section:</Text>
                 <Text className="text-lg text-gray-800">{patient.previous_c_section ? 'Yes' : 'No'}</Text>
               </View>
@@ -156,7 +156,7 @@ const PatientDetails = () => {
         </View>
       </ScrollView>
       
-      <Footer />
+      <Footer className="pt-10" />
     </View>
   )
 }

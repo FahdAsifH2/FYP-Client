@@ -14,7 +14,6 @@ const Patients = () => {
   useEffect(() => {
     axios.get('http://192.168.31.188:5001/api/patients/getPatientsNames')
       .then(res => {
-        console.log('API Response:', res.data)
         setPatients(res.data.data)
         setLoading(false)
       })
