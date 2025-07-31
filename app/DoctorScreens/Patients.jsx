@@ -12,16 +12,18 @@ const Patients = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    axios.get('http://192.168.31.188:5001/api/Doctors/getPatientsNames')
+    axios.get('http://192.168.31.189:5001/api/Doctors/getPatientsNames')
       .then(res => {
+        console.log("Promise worked for Fetching patinets")
         setPatients(res.data.data)
+    
         setLoading(false)
       })
       .catch(err => {
         console.log('Error loading patients:', err)
         setLoading(false)
       })
-  }, [])
+  }, []) // Fixed: removed [id] dependency
 
   const handleDetailsPress = (patient) => {
     console.log('Selected patient:', patient)
@@ -33,7 +35,7 @@ const Patients = () => {
     
     router.push({
       pathname: '/DoctorScreens/PatientDetails',
-      params: { id: patient.id.toString() } //  Ensure ID is string
+      params: { id: patient.id.toString() }
     })
   }
 
