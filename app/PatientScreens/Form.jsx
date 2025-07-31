@@ -67,7 +67,7 @@ const Form = () => {
 
     try {
       const response = await axios.post(
-        "http://192.168.31.188:5001/api/patients/putPatients",
+        "http://192.168.31.189:5001/api/Doctors/putPatients",
         apiPayload
       );
 
