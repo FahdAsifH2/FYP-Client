@@ -29,7 +29,7 @@ const Dashboard = () => {
         <Cards 
           Title="Patients History"
           Description="Chat and interact with your patient."
-          onPress={() => console.log("Navigation to the Patients History")}
+          onPress={() => router.push('/DoctorScreens/AntenatalForm')}
         />
         <View style={{ height: 24 }} />
         <Cards 

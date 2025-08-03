@@ -12,7 +12,7 @@ const Patients = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    axios.get('http://192.168.31.189:5001/api/Doctors/getPatientsNames')
+    axios.get('http://192.168.31.188:5001/api/Doctors/getPatientsNames')
       .then(res => {
         console.log("Promise worked for Fetching patinets")
         setPatients(res.data.data)

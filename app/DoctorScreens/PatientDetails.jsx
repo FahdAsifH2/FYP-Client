@@ -22,7 +22,7 @@ const PatientDetails = () => {
     
     console.log('Patient ID received:', id)
     
-    axios.get(`http://192.168.31.189:5001/api/Doctors/getPatientDetails/${id}`)
+    axios.get(`http://192.168.31.188:5001/api/Doctors/getPatientDetails/${id}`)
       .then(res => {
         console.log('Full API Response:', res.data) // Debug: see full response
         console.log('Response data field:', res.data.data) 
