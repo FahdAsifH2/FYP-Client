@@ -13,7 +13,7 @@ const Dashboard = () => {
       <Background />
       <Navbar />
       
-      <View className="flex-1 justify-center items-center px-4 mt-32">
+      <View className="flex-1 justify-center items-center px-4 mt-32 mb-12">
         <Cards 
           Title="Predict Delivery Mode"
           Description="Use this tool to predict the most likely delivery method for your patient."
