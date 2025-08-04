@@ -56,7 +56,7 @@ const Patients = () => {
     <View className="flex-1 bg-white px-4 pt-10 pb-16">
       <Navbar />
       <Background/>
-      <Text className="text-4xl font-bold text-purple-500 text-center mt-24 mb-6">
+      <Text className="text-4xl font-bold text-purple-500 text-center mt-16 mb-2">
         PATIENTS
       </Text>
       
