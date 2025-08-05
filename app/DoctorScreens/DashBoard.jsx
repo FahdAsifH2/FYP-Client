@@ -17,7 +17,7 @@ const Dashboard = () => {
         <Cards 
           Title="Predict Delivery Mode"
           Description="Use this tool to predict the most likely delivery method for your patient."
-          onPress={() => console.log("Navigation to the model")}
+          onPress={() => router.push('/DoctorScreens/PredictDelivery')}
         />
         <View style={{ height: 24 }} />
         <Cards 
