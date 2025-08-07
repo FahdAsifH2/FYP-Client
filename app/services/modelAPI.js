@@ -49,9 +49,7 @@ export const transformPatientDataForModel = (patientData) => {
   return {
     mother_age: parseFloat(patientData.age) || 0,
     gravida: parseFloat(patientData.gravida) || 0,
-    parity: patientData.parity !== undefined && patientData.parity !== null && !isNaN(parseFloat(patientData.parity))
-      ? parseFloat(patientData.parity)
-      : (parseFloat(patientData.gravida) - 1 || 0), // Use actual parity if available, else fallback
+    parity: parseFloat(patientData.parity) || (parseFloat(patientData.gravida) - 1) || 0, // Parity is usually gravida - 1
     gestation_weeks: 38.0, // Default value, you might want to add this field to your database
     previous_cs: patientData.previous_c_section ? 1.0 : 0.0
   };
