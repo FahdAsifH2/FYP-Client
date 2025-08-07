@@ -8,11 +8,13 @@ import {
   Alert,
   ActivityIndicator 
 } from 'react-native';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import Background from '../components/Background';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { config } from '../config/config'; 
+
+// Constants
+const DEFAULT_REQUEST_TIMEOUT_MS = 10000; 
 
 const PredictDelivery = () => {
   const [formData, setFormData] = useState({
@@ -32,8 +34,18 @@ const PredictDelivery = () => {
 
   const handlePredict = async () => {
     
-    if (!formData.mother_age || !formData.gravida || !formData.parity || 
-        !formData.gestation_weeks || !formData.previous_cs) {
+    if (
+      formData.mother_age === '' ||
+      formData.gravida === '' ||
+      formData.parity === '' ||
+      formData.gestation_weeks === '' ||
+      formData.previous_cs === '' ||
+      formData.mother_age == null ||
+      formData.gravida == null ||
+      formData.parity == null ||
+      formData.gestation_weeks == null ||
+      formData.previous_cs == null
+    ) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
@@ -45,6 +57,13 @@ const PredictDelivery = () => {
     const weeks = parseFloat(formData.gestation_weeks);
     const cs = parseFloat(formData.previous_cs);
 
+    // Validate numeric inputs
+    if (isNaN(age) || isNaN(gravida) || isNaN(parity) || isNaN(weeks) || isNaN(cs)) {
+      Alert.alert('Error', 'Please enter valid numeric values');
+      return;
+    }
+
+    // Range validations
     if (age < 12 || age > 60) {
       Alert.alert('Error', 'Mother age must be between 12 and 60 years');
       return;
@@ -55,6 +74,18 @@ const PredictDelivery = () => {
     }
     if (parity > gravida) {
       Alert.alert('Error', 'Parity cannot be greater than Gravida');
+      return;
+    }
+    if (cs < 0) {
+      Alert.alert('Error', 'Previous cesarean sections cannot be negative');
+      return;
+    }
+    if (gravida < 1) {
+      Alert.alert('Error', 'Gravida must be at least 1');
+      return;
+    }
+    if (parity < 0) {
+      Alert.alert('Error', 'Parity cannot be negative');
       return;
     }
 
@@ -80,7 +111,7 @@ const PredictDelivery = () => {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
-          timeout: config.REQUEST_TIMEOUT || 10000,
+          timeout: config.REQUEST_TIMEOUT || DEFAULT_REQUEST_TIMEOUT_MS,
           validateStatus: function (status) {
             return status >= 200 && status < 300;
           }
@@ -102,11 +133,25 @@ const PredictDelivery = () => {
       let errorMessage = 'Unable to get prediction. Please check if the model server is running.';
       
       if (error.response) {
-        errorMessage = error.response.data?.detail || `Server error: ${error.response.status}`;
+        // Server responded with error status
+        const status = error.response.status;
+        const detail = error.response.data?.detail || error.response.data?.message;
+        
+        if (status === 400) {
+          errorMessage = `Invalid input data: ${detail || 'Please check your input values'}`;
+        } else if (status === 422) {
+          errorMessage = `Validation error: ${detail || 'Please check your input format'}`;
+        } else if (status === 500) {
+          errorMessage = `Server error: ${detail || 'Model prediction failed'}`;
+        } else {
+          errorMessage = detail || `Server error: ${status}`;
+        }
       } else if (error.request) {
-        errorMessage = 'Network error. Please check your connection and server URL.';
+        errorMessage = 'Network error. Please check your internet connection and server URL.';
       } else if (error.code === 'ECONNABORTED') {
-        errorMessage = 'Request timeout. Please try again.';
+        errorMessage = 'Request timeout. The server is taking too long to respond.';
+      } else {
+        errorMessage = `Unexpected error: ${error.message}`;
       }
       
       Alert.alert('Prediction Failed', errorMessage);
@@ -127,38 +172,44 @@ const PredictDelivery = () => {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      <Navbar />
-      <Background />
+    <View className="flex-1 bg-gray-50">
+      {/* Header */}
+      <View className="pt-16 pb-6 px-6 bg-white">
+        <View className="flex-row items-center justify-between">
+          <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="#374151" />
+          </TouchableOpacity>
+          <View className="flex-1 items-center">
+            <Text className="text-xl font-bold text-gynai-gray-800">
+              Delivery Prediction
+            </Text>
+          </View>
+          <View className="w-6" />
+        </View>
+      </View>
       
-      <ScrollView className="flex-1 px-4 pt-32" showsVerticalScrollIndicator={false}>
-        <Text className="text-3xl font-bold text-purple-500 text-center mb-8">
-          DELIVERY MODE PREDICTION
+      <ScrollView className="flex-1 px-6 py-4" showsVerticalScrollIndicator={false}>
+        <Text className="text-2xl font-bold text-primary-600 text-center mb-2">
+          AI Delivery Mode Prediction
+        </Text>
+        <Text className="text-sm text-gynai-gray-600 text-center mb-8">
+          Enter patient information to get AI-powered delivery recommendations
         </Text>
 
         {/* Input Form */}
-        <View style={{
-          backgroundColor: '#E9D5FF',
-          borderRadius: 12,
-          padding: 24,
-          marginBottom: 24
-        }}>
-          <Text style={{
-            fontSize: 20,
-            fontWeight: 'bold',
-            color: '#1F2937',
-            marginBottom: 16,
-            textAlign: 'center'
-          }}>
+        <View className="bg-white rounded-3xl p-6 mb-6 shadow-lg border border-gray-100">
+          <Text className="text-lg font-bold text-gynai-gray-800 mb-6 text-center">
             Patient Information
           </Text>
 
           <InputField
-            label="Mother's Age (12-60 years)"
+            label="Mother's Age"
             value={formData.mother_age}
             onChange={(val) => handleChange('mother_age', val)}
             keyboardType="numeric"
-            placeholder="e.g., 28"
+            placeholder="Enter age (12-60 years)"
+            icon="person"
+            required={true}
           />
 
           <InputField
@@ -166,7 +217,9 @@ const PredictDelivery = () => {
             value={formData.gravida}
             onChange={(val) => handleChange('gravida', val)}
             keyboardType="numeric"
-            placeholder="e.g., 2"
+            placeholder="Total number of pregnancies (minimum 1)"
+            icon="heart"
+            required={true}
           />
 
           <InputField
@@ -174,15 +227,19 @@ const PredictDelivery = () => {
             value={formData.parity}
             onChange={(val) => handleChange('parity', val)}
             keyboardType="numeric"
-            placeholder="e.g., 1"
+            placeholder="Number of previous live births (0 or more)"
+            icon="happy"
+            required={true}
           />
 
           <InputField
-            label="Gestational Weeks (20-45)"
+            label="Gestational Weeks"
             value={formData.gestation_weeks}
             onChange={(val) => handleChange('gestation_weeks', val)}
             keyboardType="numeric"
-            placeholder="e.g., 38.5"
+            placeholder="Current gestational weeks (20-45)"
+            icon="time"
+            required={true}
           />
 
           <InputField
@@ -190,34 +247,46 @@ const PredictDelivery = () => {
             value={formData.previous_cs}
             onChange={(val) => handleChange('previous_cs', val)}
             keyboardType="numeric"
-            placeholder="e.g., 1 (0 for none)"
+            placeholder="Number of previous C-sections (0 if none)"
+            icon="medical"
+            required={true}
           />
 
           {/* Action Buttons */}
-          <View className="mt-6">
+          <View className="mt-6 space-y-3">
             <TouchableOpacity
               onPress={resetForm}
-              className="bg-gray-400 py-4 px-6 rounded-lg mb-3"
+              className="bg-gray-100 py-4 px-6 rounded-2xl border border-gray-200"
             >
-              <Text className="text-white font-bold text-center text-lg">
-                RESET FORM
+              <Text className="text-gynai-gray-700 font-semibold text-center text-base">
+                Reset Form
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={handlePredict}
               disabled={loading}
-              className="bg-purple-600 py-4 px-6 rounded-lg"
+              className="bg-primary-500 py-4 px-6 rounded-2xl shadow-lg"
+              style={{
+                shadowColor: '#ec4899',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 8,
+              }}
             >
               {loading ? (
                 <View className="flex-row justify-center items-center">
                   <ActivityIndicator color="white" size="small" />
-                  <Text className="text-white font-bold ml-2">Predicting...</Text>
+                  <Text className="text-white font-bold ml-2">Analyzing...</Text>
                 </View>
               ) : (
-                <Text className="text-white font-bold text-center text-lg">
-                  🔮 PREDICT DELIVERY MODE
-                </Text>
+                <View className="flex-row justify-center items-center">
+                  <Ionicons name="analytics" size={20} color="white" />
+                  <Text className="text-white font-bold text-center text-base ml-2">
+                    Predict Delivery Mode
+                  </Text>
+                </View>
               )}
             </TouchableOpacity>
           </View>
@@ -225,63 +294,60 @@ const PredictDelivery = () => {
 
         {/* Prediction Results*/}
         {prediction && (
-          <View className="bg-green-100 rounded-xl p-6 mb-6 border-2 border-green-300">
-            <Text className="text-2xl font-bold text-gray-800 mb-6 text-center">
-              🎯 PREDICTION RESULTS
-            </Text>
+          <View className="bg-white rounded-3xl p-6 mb-6 shadow-lg border border-gray-100">
+            <View className="items-center mb-6">
+              <View className="w-16 h-16 bg-green-100 rounded-full items-center justify-center mb-4">
+                <Ionicons name="checkmark-circle" size={32} color="#10b981" />
+              </View>
+              <Text className="text-xl font-bold text-gynai-gray-800 text-center">
+                Prediction Results
+              </Text>
+            </View>
             
-            <View>
-              <View className="mb-6 bg-white p-4 rounded-lg shadow">
-                <Text className="text-lg font-semibold text-green-600 mb-2">
-                  🏥 Recommended Delivery Mode:
+            <View className="space-y-4">
+              <View className="bg-primary-50 p-4 rounded-2xl border border-primary-200">
+                <Text className="text-sm font-semibold text-primary-700 mb-2">
+                  Recommended Delivery Mode
                 </Text>
-                <Text className="text-2xl text-gray-800 font-bold text-center bg-yellow-100 p-3 rounded">
+                <Text className="text-xl text-gynai-gray-800 font-bold">
                   {prediction.predicted_delivery_type}
                 </Text>
               </View>
 
               {prediction.confidence_score && (
-                <View className="mb-4 bg-white p-4 rounded-lg shadow">
-                  <Text className="text-lg font-semibold text-blue-600 mb-2">
-                    📊 Confidence Score:
+                <View className="bg-blue-50 p-4 rounded-2xl border border-blue-200">
+                  <Text className="text-sm font-semibold text-blue-700 mb-2">
+                    Confidence Score
                   </Text>
-                  <Text className="text-xl text-gray-800 font-bold">
+                  <Text className="text-lg text-gynai-gray-800 font-semibold">
                     {(prediction.confidence_score * 100).toFixed(1)}%
                   </Text>
                 </View>
               )}
 
               {prediction.probabilities && (
-                <View className="mb-4 bg-white p-4 rounded-lg shadow">
-                  <Text className="text-lg font-semibold text-purple-600 mb-2">
-                    📈 All Probabilities:
+                <View className="bg-purple-50 p-4 rounded-2xl border border-purple-200">
+                  <Text className="text-sm font-semibold text-purple-700 mb-3">
+                    All Probabilities
                   </Text>
                   {Object.entries(prediction.probabilities).map(([mode, prob]) => (
-                    <Text key={mode} className="text-md text-gray-700 ml-2 mb-1">
-                      • {mode}: {(prob * 100).toFixed(1)}%
-                    </Text>
+                    <View key={mode} className="flex-row justify-between items-center mb-2">
+                      <Text className="text-sm text-gynai-gray-700">{mode}</Text>
+                      <Text className="text-sm font-semibold text-gynai-gray-800">
+                        {(prob * 100).toFixed(1)}%
+                      </Text>
+                    </View>
                   ))}
                 </View>
               )}
 
-              {prediction.confidence_level && (
-                <View className="mb-4 bg-white p-4 rounded-lg shadow">
-                  <Text className="text-lg font-semibold text-indigo-600 mb-2">
-                    🎚️ Confidence Level:
-                  </Text>
-                  <Text className="text-md text-gray-700">
-                    {prediction.confidence_level.level}: {prediction.confidence_level.description}
-                  </Text>
-                </View>
-              )}
-
               {prediction.risk_factors && prediction.risk_factors.length > 0 && (
-                <View className="mb-4 bg-red-50 p-4 rounded-lg border border-red-200">
-                  <Text className="text-lg font-semibold text-red-600 mb-2">
-                    ⚠️ Risk Factors:
+                <View className="bg-red-50 p-4 rounded-2xl border border-red-200">
+                  <Text className="text-sm font-semibold text-red-700 mb-3">
+                    Risk Factors
                   </Text>
                   {prediction.risk_factors.map((factor, index) => (
-                    <Text key={index} className="text-md text-gray-700 ml-2 mb-1">
+                    <Text key={index} className="text-sm text-gynai-gray-700 mb-1">
                       • {factor}
                     </Text>
                   ))}
@@ -289,12 +355,12 @@ const PredictDelivery = () => {
               )}
 
               {prediction.recommendations && prediction.recommendations.length > 0 && (
-                <View className="mb-4 bg-blue-50 p-4 rounded-lg border border-blue-200">
-                  <Text className="text-lg font-semibold text-blue-600 mb-2">
-                    💡 Clinical Recommendations:
+                <View className="bg-green-50 p-4 rounded-2xl border border-green-200">
+                  <Text className="text-sm font-semibold text-green-700 mb-3">
+                    Clinical Recommendations
                   </Text>
                   {prediction.recommendations.map((recommendation, index) => (
-                    <Text key={index} className="text-md text-gray-700 ml-2 mb-1">
+                    <Text key={index} className="text-sm text-gynai-gray-700 mb-1">
                       • {recommendation}
                     </Text>
                   ))}
@@ -304,40 +370,32 @@ const PredictDelivery = () => {
           </View>
         )}
 
-        <View className="mb-32" />
+        <View className="mb-8" />
       </ScrollView>
     </View>
   );
 };
 
 
-const InputField = ({ label, value, onChange, keyboardType = 'default', placeholder }) => (
-  <View style={{ marginBottom: 16 }}>
-    <Text style={{ 
-      marginBottom: 8, 
-      color: '#374151', 
-      fontWeight: '600',
-      fontSize: 16 
-    }}>
-      {label}
+const InputField = ({ label, value, onChange, keyboardType = 'default', placeholder, icon, required = false }) => (
+  <View className="mb-4">
+    <Text className="text-sm font-semibold text-gynai-gray-700 mb-2">
+      {label}{required && <Text className="text-red-500"> *</Text>}
     </Text>
-    <TextInput
-      value={value}
-      onChangeText={onChange}
-      keyboardType={keyboardType}
-      placeholder={placeholder}
-      style={{
-        borderWidth: 1,
-        borderColor: '#D1A3FF',
-        padding: 12,
-        borderRadius: 8,
-        color: '#1F2937',
-        backgroundColor: 'white',
-        fontSize: 16,
-        minHeight: 48
-      }}
-      placeholderTextColor="#9CA3AF"
-    />
+    <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3">
+      <Ionicons name={icon} size={20} color="#9ca3af" />
+      <TextInput
+        value={value}
+        onChangeText={onChange}
+        keyboardType={keyboardType}
+        placeholder={placeholder}
+        className="flex-1 ml-3 text-gynai-gray-800 text-base"
+        placeholderTextColor="#9CA3AF"
+        returnKeyType="next"
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+    </View>
   </View>
 );
 
