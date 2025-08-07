@@ -33,7 +33,7 @@ const Dashboard = () => {
       </View>
 
       {/* Main Content */}
-      <ScrollView className="flex-1 px-6 py-4">
+      <ScrollView className="flex-1 px-6 py-4" showsVerticalScrollIndicator={false}>
         <View className="space-y-4">
           <Cards 
             Title="Predict Delivery Mode"
