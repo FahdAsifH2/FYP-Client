@@ -12,7 +12,7 @@ const Patients = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    axios.get('http://192.168.31.188:5001/api/Doctors/getPatientsNames')
+    axios.get('http://192.168.110.218:5001/api/Doctors/getPatientsNames')
       .then(res => {
         console.log("Promise worked for Fetching patinets")
         setPatients(res.data.data)
@@ -56,7 +56,7 @@ const Patients = () => {
     <View className="flex-1 bg-white px-4 pt-10 pb-16">
       <Navbar />
       <Background/>
-      <Text className="text-4xl font-bold text-purple-500 text-center mt-24 mb-6">
+      <Text className="text-4xl font-bold text-purple-500 text-center mt-16 mb-2">
         PATIENTS
       </Text>
       
