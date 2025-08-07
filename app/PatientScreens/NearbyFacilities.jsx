@@ -14,6 +14,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LocationService } from '../services/locationService';
 
+const PHONE_NUMBER_CLEAN_REGEX = /[^+\d]/g;
+
 const NearbyFacilities = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('pharmacies');
@@ -38,7 +40,14 @@ const NearbyFacilities = () => {
         loadHospitals(location)
       ]);
     } catch (error) {
-      Alert.alert('Location Error', 'Could not get your location. Showing default results.');
+      Alert.alert(
+        'Location Required', 
+        'This feature requires location access to find nearby facilities. Please enable location services in your device settings and try again.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Retry', onPress: () => initializeLocation() }
+        ]
+      );
       console.error('Location error:', error);
     } finally {
       setLoading(false);
@@ -94,7 +103,7 @@ const NearbyFacilities = () => {
       return;
     }
     
-    const cleanNumber = phoneNumber.replace(/[^+\d]/g, '');
+    const cleanNumber = phoneNumber.replace(PHONE_NUMBER_CLEAN_REGEX, '');
     Linking.openURL(`tel:${cleanNumber}`).catch(err => {
       console.error('Error making call:', err);
       Alert.alert('Error', 'Could not make phone call');

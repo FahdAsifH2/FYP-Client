@@ -3,44 +3,107 @@ import React from "react";
 import { useRouter } from "expo-router";
 import { Ionicons } from '@expo/vector-icons';
 import { useHealth } from '../contexts/HealthContext';
+import { patientsDashboardStyles, getCardWidth } from '../styles/PatientsDashBoard.styles';
 
 const { width } = Dimensions.get('window');
-const cardWidth = (width - 48) / 2 - 8; // 48 for padding, 8 for gap
+const cardWidth = getCardWidth(); // Use imported utility
+const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+const DEFAULT_PREGNANCY_DURATION = 40; // Default pregnancy duration in weeks
+
+// Use imported styles
+const styles = patientsDashboardStyles;
 
 const PatientsDashBoard = () => {
   const router = useRouter();
   const { getWaterProgress, getSleepDisplay, loadHealthData, waterCount, sleepHours } = useHealth();
+  
+  // TODO: Replace with actual user data from context/API
+  const [pregnancyData, setPregnancyData] = React.useState({
+    currentWeek: null,
+    dueDate: null,
+    lastMenstrualPeriod: null,
+    totalDuration: DEFAULT_PREGNANCY_DURATION,
+    isPregnant: false
+  });
 
-  // Refresh data when component mounts
+ 
   React.useEffect(() => {
     loadHealthData();
+    loadPregnancyData();
     console.log('Dashboard loaded - Water:', waterCount, 'Sleep:', sleepHours);
   }, []);
 
-  // Calculate current pregnancy week based on current date
-  const getCurrentWeek = () => {
-    // For demo purposes, using a base date calculation
-    // In a real app, this would be based on last menstrual period (LMP) or due date
-    const today = new Date();
-    const startOfYear = new Date(today.getFullYear(), 0, 1);
-    const weekNumber = Math.ceil(((today - startOfYear) / (24 * 60 * 60 * 1000) + startOfYear.getDay() + 1) / 7);
-    
-    // Calculate pregnancy week (typically 1-40 weeks)
-    const pregnancyWeek = ((weekNumber % 40) || 1) + 20; // Starting from week 20 for demo
-    return Math.min(pregnancyWeek, 40);
+  // Load user's pregnancy data from API/context
+  const loadPregnancyData = async () => {
+    try {
+      // TODO: Replace with actual API call to get user's pregnancy data
+      // const response = await getUserPregnancyData();
+      // setPregnancyData(response.data);
+      
+      // For now, using demo data - this should be replaced with real user data
+      setPregnancyData({
+        currentWeek: 28, // This should come from user's actual data
+        dueDate: new Date(Date.now() + (12 * 7 * MILLISECONDS_PER_DAY)), // 12 weeks from now
+        lastMenstrualPeriod: new Date(Date.now() - (28 * 7 * MILLISECONDS_PER_DAY)), // 28 weeks ago
+        totalDuration: 40, // This could vary per user
+        isPregnant: true
+      });
+    } catch (error) {
+      console.error('Error loading pregnancy data:', error);
+      
+      setPregnancyData({
+        currentWeek: null,
+        dueDate: null,
+        lastMenstrualPeriod: null,
+        totalDuration: DEFAULT_PREGNANCY_DURATION,
+        isPregnant: false
+      });
+    }
   };
 
-  const getWeeksToGo = (currentWeek) => {
-    return Math.max(40 - currentWeek, 0);
+  // Calculate pregnancy progress based on user's actual data
+  const getPregnancyProgress = () => {
+    if (!pregnancyData.isPregnant || !pregnancyData.currentWeek) {
+      return {
+        currentWeek: 0,
+        weeksToGo: 0,
+        progressPercentage: 0,
+        isPregnant: false
+      };
+    }
+
+    const currentWeek = pregnancyData.currentWeek;
+    const totalDuration = pregnancyData.totalDuration;
+    const weeksToGo = Math.max(totalDuration - currentWeek, 0);
+    const progressPercentage = Math.round((currentWeek / totalDuration) * 100);
+
+    return {
+      currentWeek,
+      weeksToGo,
+      progressPercentage: Math.min(progressPercentage, 100),
+      isPregnant: true
+    };
   };
 
-  const getProgressPercentage = (currentWeek) => {
-    return Math.round((currentWeek / 40) * 100);
+  // Get baby size description based on current week
+  const getBabyDescription = (week) => {
+    if (week <= 0) return "Start your pregnancy journey! 🌱";
+    if (week <= 4) return "Your baby is the size of a poppy seed! 🌱";
+    if (week <= 8) return "Your baby is the size of a raspberry! 🫐";
+    if (week <= 12) return "Your baby is the size of a lime! 🟢";
+    if (week <= 16) return "Your baby is the size of an avocado! 🥑";
+    if (week <= 20) return "Your baby is the size of a banana! 🍌";
+    if (week <= 24) return "Your baby is the size of an ear of corn! 🌽";
+    if (week <= 28) return "Your baby is the size of an eggplant! 🍆";
+    if (week <= 32) return "Your baby is the size of a coconut! 🥥";
+    if (week <= 36) return "Your baby is the size of a papaya! 🧡";
+    if (week <= 40) return "Your baby is full term! Ready to meet you! 👶";
+    return "Congratulations on your bundle of joy! 👶";
   };
 
-  const currentWeek = getCurrentWeek();
-  const weeksToGo = getWeeksToGo(currentWeek);
-  const progressPercentage = getProgressPercentage(currentWeek);
+  // Get pregnancy progress data
+  const pregnancyProgress = getPregnancyProgress();
+  const { currentWeek, weeksToGo, progressPercentage, isPregnant } = pregnancyProgress;
 
   const FeatureCard = ({ title, description, onPress, icon, colors, size = "large" }) => (
     <TouchableOpacity
@@ -100,32 +163,65 @@ const PatientsDashBoard = () => {
             <Ionicons name="notifications-outline" size={24} color="#374151" />
           </TouchableOpacity>
         </View>
-        <Text style={styles.headerTitle}>Welcome Back!</Text>
-        <Text style={styles.headerSubtitle}>Your pregnancy journey, day by day</Text>
+        <Text style={styles.headerTitle}>
+          {isPregnant ? 'Welcome Back!' : 'Welcome to GynAI!'}
+        </Text>
+        <Text style={styles.headerSubtitle}>
+          {isPregnant 
+            ? 'Your pregnancy journey, day by day' 
+            : 'Your health and wellness companion'
+          }
+        </Text>
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Pregnancy Progress Card */}
-        <View style={styles.section}>
-          <View style={styles.progressCard}>
-            <View style={styles.progressHeader}>
-              <View>
-                <Text style={styles.weekText}>Week {currentWeek}</Text>
-                <Text style={styles.weeksToGoText}>{weeksToGo} weeks to go</Text>
+        {isPregnant ? (
+          <View style={styles.section}>
+            <View style={styles.progressCard}>
+              <View style={styles.progressHeader}>
+                <View>
+                  <Text style={styles.weekText}>Week {currentWeek}</Text>
+                  <Text style={styles.weeksToGoText}>
+                    {weeksToGo > 0 ? `${weeksToGo} weeks to go` : 'Full term reached!'}
+                  </Text>
+                </View>
+                <View style={styles.heartContainer}>
+                  <Ionicons name="heart" size={24} color="white" />
+                </View>
               </View>
-              <View style={styles.heartContainer}>
-                <Ionicons name="heart" size={24} color="white" />
+              <Text style={styles.progressDescription}>
+                {getBabyDescription(currentWeek)}
+              </Text>
+              <View style={styles.progressBarContainer}>
+                <View style={[styles.progressBar, { width: `${progressPercentage}%` }]} />
               </View>
+              <Text style={styles.progressPercent}>{progressPercentage}% Complete</Text>
+              {pregnancyData.dueDate && (
+                <Text style={styles.dueDateText}>
+                  Due: {pregnancyData.dueDate.toLocaleDateString()}
+                </Text>
+              )}
             </View>
-            <Text style={styles.progressDescription}>
-              Your baby is now the size of a corn. Amazing progress! 🌽
-            </Text>
-            <View style={styles.progressBarContainer}>
-              <View style={[styles.progressBar, { width: `${progressPercentage}%` }]} />
-            </View>
-            <Text style={styles.progressPercent}>{progressPercentage}% Complete</Text>
           </View>
-        </View>
+        ) : (
+          <View style={styles.section}>
+            <View style={[styles.progressCard, { backgroundColor: '#6366F1' }]}>
+              <View style={styles.progressHeader}>
+                <View>
+                  <Text style={styles.weekText}>Welcome to GynAI</Text>
+                  <Text style={styles.weeksToGoText}>Your health companion</Text>
+                </View>
+                <View style={styles.heartContainer}>
+                  <Ionicons name="heart-outline" size={24} color="white" />
+                </View>
+              </View>
+              <Text style={styles.progressDescription}>
+                Track your health, find nearby facilities, and get expert advice. 💜
+              </Text>
+            </View>
+          </View>
+        )}
 
         {/* Quick Insights */}
         <View style={styles.section}>
@@ -281,315 +377,5 @@ const PatientsDashBoard = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FAFAFA', // Material Design surface color
-  },
-  header: {
-    paddingTop: 64,
-    paddingBottom: 24,
-    paddingHorizontal: 24,
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 8,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  section: {
-    paddingHorizontal: 24,
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 16,
-  },
-  progressCard: {
-    backgroundColor: '#EC4899',
-    borderRadius: 24,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  weekText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  weeksToGoText: {
-    color: '#F9A8D4',
-    fontSize: 14,
-  },
-  heartContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 24,
-    width: 48,
-    height: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  progressDescription: {
-    color: 'white',
-    fontSize: 14,
-    marginBottom: 12,
-  },
-  progressBarContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 8,
-    height: 8,
-    marginBottom: 8,
-  },
-  progressBar: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    height: 8,
-    width: '60%',
-  },
-  progressPercent: {
-    color: '#F9A8D4',
-    fontSize: 12,
-  },
-  insightsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 16,
-  },
-  insightCard: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 16,
-    flex: 1,
-    marginHorizontal: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  insightHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  insightIcon: {
-    borderRadius: 8,
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  changeText: {
-    color: '#10B981',
-    fontSize: 11,
-    fontWeight: '600',
-    textAlign: 'right',
-    flexShrink: 1,
-    numberOfLines: 1,
-  },
-  insightValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 4,
-  },
-  insightTitle: {
-    color: '#6B7280',
-    fontSize: 12,
-  },
-  featuresGrid: {
-    gap: 16,
-  },
-  featuresRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 16,
-  },
-  tipsScrollView: {
-    flexGrow: 0,
-  },
-  tipCard: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 20,
-    marginRight: 16,
-    width: 280,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  tipIcon: {
-    marginBottom: 12,
-  },
-  tipTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 8,
-  },
-  tipDescription: {
-    fontSize: 14,
-    color: '#6B7280',
-    lineHeight: 20,
-    marginBottom: 12,
-  },
-  tipCategory: {
-    fontSize: 12,
-    color: '#EC4899',
-    fontWeight: '600',
-    backgroundColor: '#FDF2F8',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-  },
-  resourcesContainer: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  resourceCard: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 16,
-    flex: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  resourceHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  resourceBadge: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#EF4444',
-    backgroundColor: '#FEF2F2',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  resourceTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 4,
-  },
-  resourceSubtitle: {
-    fontSize: 12,
-    color: '#6B7280',
-  },
-  featuresContainer: {
-    gap: 16,
-  },
-  smallCardsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 16,
-  },
-  featureCard: {
-    backgroundColor: 'white',
-    borderRadius: 20, // More rounded for modern look
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.10,
-    shadowRadius: 20,
-    elevation: 12,
-    borderWidth: 0.5,
-    borderColor: '#F3F4F6',
-  },
-  iconContainer: {
-    borderRadius: 16,
-    width: 56,
-    height: 56,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  cardTitle: {
-    fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 8,
-  },
-  cardDescription: {
-    color: '#6B7280',
-    lineHeight: 20,
-  },
-  quickActionsContainer: {
-    gap: 12,
-  },
-  quickActionCard: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  quickIconContainer: {
-    borderRadius: 12,
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  quickTextContainer: {
-    flex: 1,
-  },
-  quickTitle: {
-    fontWeight: '600',
-    color: '#111827',
-    fontSize: 14,
-  },
-  quickSubtitle: {
-    color: '#6B7280',
-    fontSize: 12,
-    marginTop: 2,
-  },
-});
 
 export default PatientsDashBoard;
