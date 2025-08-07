@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "my-app",
-    "slug": "my-app",
+    "name": "GynAI",
+    "slug": "gynai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "gynai",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -16,7 +16,10 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.ACTIVITY_RECOGNITION"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -33,7 +36,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true
