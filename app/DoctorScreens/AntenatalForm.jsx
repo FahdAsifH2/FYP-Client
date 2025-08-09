@@ -7,17 +7,23 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   ScrollView,
+  Modal,
   Platform,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+
 import Background from "../components/Background";
 
 const AntenatalForm = () => {
   const [showPatientInfo, setShowPatientInfo] = useState(false);
   const [showPatientIdentification, setShowPatientIdentification] =
     useState(false);
+  const [showPatientComplaint, setShowPatientComplaint] = useState(false);
+  const [showObstetricHistory, setShowObstetricHistory] = useState(false);
+  const [showLastMontPeriod, setShowLastMontPeriod] = useState(false);
 
   // Patient Info states
   const [patientName, setPatientName] = useState("");
@@ -36,195 +42,956 @@ const AntenatalForm = () => {
   const [emergencyContact, setEmergencyContact] = useState("");
   const [occupation, setOccupation] = useState("");
 
+  // Patient Complaint state
+  const [complaint, setComplaint] = useState("");
+
+  //Obttetric_History Data
+  const [year, setYear] = useState("");
+  const [isFullTerm, setIsFullTerm] = useState(true);
+  const [modeOfDelivery, setModeOfDelivery] = useState("SVD");
+  const [complications, setComplications] = useState("");
+  const [gender, setGender] = useState("Female");
+  const [status, setStatus] = useState("Alive");
+  const [termModalVisible, setTermModalVisible] = useState(false);
+  const [deliveryModalVisible, setDeliveryModalVisible] = useState(false);
+  const [genderModalVisible, setGenderModalVisible] = useState(false);
+  const [statusModalVisible, setStatusModalVisible] = useState(false);
+  const [showGyneHistory, setShowGyneHistory] = useState(false);
+
+  //Gynecologicla history
+  const [menstrualCycle, setMenstrualCycle] = useState("Regular");
+  const [pcos, setPcos] = useState(false); // true/false
+  const [fibroids, setFibroids] = useState(false);
+  const [menopause, setMenopause] = useState(false);
+  const [postSterilization, setPostSterilization] = useState(false);
+  const [contraception, setContraception] = useState("None");
+  const [complicationsGyne, setComplicationsGyne] = useState("None");
+
+  // Add these state variables for modal visibility
+  const [menstrualCycleModalVisible, setMenstrualCycleModalVisible] =
+    useState(false);
+  const [pcosModalVisible, setPcosModalVisible] = useState(false);
+  const [fibroidsModalVisible, setFibroidsModalVisible] = useState(false);
+  const [menopauseModalVisible, setMenopauseModalVisible] = useState(false);
+  const [postSterilizationModalVisible, setPostSterilizationModalVisible] =
+    useState(false);
+  const [contraceptionModalVisible, setContraceptionModalVisible] =
+    useState(false);
+  4;
+
+  //Pregnancu data
+  const [LastMonthPeriod, setLastMonthPeriod] = useState(date);
+  const [ExpectedDateOfDelievery, setExpectedDateOfDelievery] = useState(date);
+
   return (
-
     <View className="flex-1">
-     
-     <Background />
+      <Background />
       <Navbar />
-      <Footer/>
-    <KeyboardAvoidingView
-      className="flex-1"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-    >
-      <ScrollView
+      <Footer />
+      <KeyboardAvoidingView
         className="flex-1"
-        contentContainerStyle={{ paddingBottom: 50 }}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
-        <View className="flex-1 items-center pt-10 mt-20">
-          <View className="w-11/12 bg-gray-100 rounded-xl p-4 shadow-md mb-6">
-            <Text className="text-2xl font-bold text-center mb-4">
-              Antenatal Form
-            </Text>
-
-            {/* Patient Info Toggle Button */}
-            <TouchableOpacity
-              className="bg-purple-400 p-3 rounded-md mb-1"
-              onPress={() => setShowPatientInfo(!showPatientInfo)}
-            >
-              <Text className="text-lg font-semibold text-black">
-                {showPatientInfo ? "▼" : "▶"} Patient Info
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ paddingBottom: 50 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View className="flex-1 items-center pt-10 mt-20">
+            <View className="w-11/12 bg-gray-100 rounded-xl p-4 shadow-md mb-6">
+              <Text className="text-2xl font-bold text-center mb-4">
+                Antenatal Form
               </Text>
-            </TouchableOpacity>
 
-            {/* Patient Info Collapsible Section */}
-            {showPatientInfo && (
-              <View>
-                <TextInput
-                  className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
-                  value={patientName}
-                  onChangeText={setPatientName}
-                  placeholder="Enter patient's name"
-                  placeholderTextColor="#4B5563"
-                  returnKeyType="next"
-                />
+              {/* Patient Info Toggle Button */}
+              <TouchableOpacity
+                className="bg-purple-400 p-3 rounded-md mb-1"
+                onPress={() => setShowPatientInfo(!showPatientInfo)}
+              >
+                <Text className="text-lg font-semibold text-black">
+                  {showPatientInfo ? "▼" : "▶"} Patient Info
+                </Text>
+              </TouchableOpacity>
 
-                <TextInput
-                  className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
-                  value={age}
-                  onChangeText={setAge}
-                  placeholder="Enter age"
-                  placeholderTextColor="#4B5563"
-                  keyboardType="numeric"
-                  returnKeyType="next"
-                />
+              {/* Patient Info Collapsible Section */}
+              {showPatientInfo && (
+                <View>
+                  <TextInput
+                    className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
+                    value={patientName}
+                    onChangeText={setPatientName}
+                    placeholder="Enter patient's name"
+                    placeholderTextColor="#4B5563"
+                    returnKeyType="next"
+                  />
 
-                <TextInput
-                  className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
-                  value={marriedSince}
-                  onChangeText={setMarriedSince}
-                  placeholder="Married since (years/months)"
-                  placeholderTextColor="#4B5563"
-                  returnKeyType="next"
-                />
+                  <TextInput
+                    className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
+                    value={age}
+                    onChangeText={setAge}
+                    placeholder="Enter age"
+                    placeholderTextColor="#4B5563"
+                    keyboardType="numeric"
+                    returnKeyType="next"
+                  />
 
-                <View className="flex-row items-center mb-1 bg-purple-200 rounded-md p-3">
-                  <Text className="flex-1 text-base text-black">
-                    Cousin Marriage
-                  </Text>
-                  <Switch
-                    value={isCousinMarriage}
-                    onValueChange={setIsCousinMarriage}
+                  <TextInput
+                    className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
+                    value={marriedSince}
+                    onChangeText={setMarriedSince}
+                    placeholder="Married since (years/months)"
+                    placeholderTextColor="#4B5563"
+                    returnKeyType="next"
+                  />
+
+                  <View className="flex-row items-center mb-1 bg-purple-200 rounded-md p-3">
+                    <Text className="flex-1 text-base text-black">
+                      Cousin Marriage
+                    </Text>
+                    <Switch
+                      value={isCousinMarriage}
+                      onValueChange={setIsCousinMarriage}
+                    />
+                  </View>
+
+                  <TextInput
+                    className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
+                    value={referredBy}
+                    onChangeText={setReferredBy}
+                    placeholder="Referred by"
+                    placeholderTextColor="#4B5563"
+                    returnKeyType="next"
+                  />
+
+                  <TextInput
+                    className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
+                    value={date}
+                    onChangeText={setDate}
+                    placeholder="Date (YYYY-MM-DD)"
+                    placeholderTextColor="#4B5563"
+                    returnKeyType="done"
                   />
                 </View>
+              )}
 
-                <TextInput
-                  className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
-                  value={referredBy}
-                  onChangeText={setReferredBy}
-                  placeholder="Referred by"
-                  placeholderTextColor="#4B5563"
-                  returnKeyType="next"
-                />
+              {/* Patient Identification Toggle Button */}
+              <TouchableOpacity
+                className="bg-purple-400 p-3 rounded-md mb-1 mt-5"
+                onPress={() =>
+                  setShowPatientIdentification(!showPatientIdentification)
+                }
+              >
+                <Text className="text-lg font-semibold text-black">
+                  {showPatientIdentification ? "▼" : "▶"} Patient
+                  Identification
+                </Text>
+              </TouchableOpacity>
 
-                <TextInput
-                  className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
-                  value={date}
-                  onChangeText={setDate}
-                  placeholder="Date (YYYY-MM-DD)"
-                  placeholderTextColor="#4B5563"
-                  returnKeyType="done"
-                />
-              </View>
-            )}
+              {/* Patient Identification Collapsible Section */}
+              {showPatientIdentification && (
+                <View>
+                  <TextInput
+                    className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
+                    value={relation}
+                    onChangeText={setRelation}
+                    placeholder="W/O or D/O"
+                    placeholderTextColor="#4B5563"
+                    returnKeyType="next"
+                  />
 
-            {/* Patient Identification Toggle Button */}
-            <TouchableOpacity
-              className="bg-purple-400 p-3 rounded-md mb-1 mt-5"
-              onPress={() =>
-                setShowPatientIdentification(!showPatientIdentification)
-              }
-            >
-              <Text className="text-lg font-semibold text-black">
-                {showPatientIdentification ? "▼" : "▶"} Patient Identification
-              </Text>
-            </TouchableOpacity>
+                  <TextInput
+                    className="bg-purple-200 w-full rounded-md px-4 text-black mb-1"
+                    style={{
+                      minHeight: 60,
+                      textAlignVertical: "top",
+                      paddingTop: 12,
+                    }}
+                    value={address}
+                    onChangeText={setAddress}
+                    placeholder="Address"
+                    placeholderTextColor="#4B5563"
+                    multiline
+                    numberOfLines={3}
+                    returnKeyType="next"
+                  />
 
-            {/* Patient Identification Collapsible Section */}
-            {showPatientIdentification && (
-              <View>
-                <TextInput
-                  className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
-                  value={relation}
-                  onChangeText={setRelation}
-                  placeholder="W/O or D/O"
-                  placeholderTextColor="#4B5563"
-                  returnKeyType="next"
-                />
+                  <TextInput
+                    className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
+                    value={telephone}
+                    onChangeText={setTelephone}
+                    placeholder="Telephone"
+                    placeholderTextColor="#4B5563"
+                    keyboardType="phone-pad"
+                    returnKeyType="next"
+                  />
 
-                <TextInput
-                  className="bg-purple-200 w-full rounded-md px-4 text-black mb-1"
-                  style={{
-                    minHeight: 60,
-                    textAlignVertical: "top",
-                    paddingTop: 12,
-                  }}
-                  value={address}
-                  onChangeText={setAddress}
-                  placeholder="Address"
-                  placeholderTextColor="#4B5563"
-                  multiline
-                  numberOfLines={3}
-                  returnKeyType="next"
-                />
+                  <TextInput
+                    className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
+                    value={bloodGroup}
+                    onChangeText={setBloodGroup}
+                    placeholder="Blood Group (A+, B+, O-, etc.)"
+                    placeholderTextColor="#4B5563"
+                    returnKeyType="next"
+                  />
 
-                <TextInput
-                  className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
-                  value={telephone}
-                  onChangeText={setTelephone}
-                  placeholder="Telephone"
-                  placeholderTextColor="#4B5563"
-                  keyboardType="phone-pad"
-                  returnKeyType="next"
-                />
+                  <TextInput
+                    className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
+                    value={husbandName}
+                    onChangeText={setHusbandName}
+                    placeholder="Husband's Name"
+                    placeholderTextColor="#4B5563"
+                    returnKeyType="next"
+                  />
 
-                <TextInput
-                  className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
-                  value={bloodGroup}
-                  onChangeText={setBloodGroup}
-                  placeholder="Blood Group (A+, B+, O-, etc.)"
-                  placeholderTextColor="#4B5563"
-                  returnKeyType="next"
-                />
+                  <TextInput
+                    className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
+                    value={emergencyContact}
+                    onChangeText={setEmergencyContact}
+                    placeholder="Emergency Contact"
+                    placeholderTextColor="#4B5563"
+                    keyboardType="phone-pad"
+                    returnKeyType="next"
+                  />
 
-                <TextInput
-                  className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
-                  value={husbandName}
-                  onChangeText={setHusbandName}
-                  placeholder="Husband's Name"
-                  placeholderTextColor="#4B5563"
-                  returnKeyType="next"
-                />
+                  <TextInput
+                    className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
+                    value={occupation}
+                    onChangeText={setOccupation}
+                    placeholder="Occupation"
+                    placeholderTextColor="#4B5563"
+                    returnKeyType="done"
+                  />
+                </View>
+              )}
 
-                <TextInput
-                  className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
-                  value={emergencyContact}
-                  onChangeText={setEmergencyContact}
-                  placeholder="Emergency Contact"
-                  placeholderTextColor="#4B5563"
-                  keyboardType="phone-pad"
-                  returnKeyType="next"
-                />
+              <TouchableOpacity
+                className="bg-purple-400 p-3 rounded-md mb-1 mt-5"
+                onPress={() => {
+                  setShowPatientComplaint(!showPatientComplaint);
+                }}
+              >
+                <Text className="text-lg font-semibold text-black">
+                  {(() => {
+                    if (showPatientComplaint) {
+                      return "▼ Patient Complaint";
+                    } else {
+                      return "▶ Patient Complaint";
+                    }
+                  })()}
+                </Text>
+              </TouchableOpacity>
 
-                <TextInput
-                  className="bg-purple-200 w-full h-12 rounded-md px-4 text-black mb-1"
-                  value={occupation}
-                  onChangeText={setOccupation}
-                  placeholder="Occupation"
-                  placeholderTextColor="#4B5563"
-                  returnKeyType="done"
-                />
-              </View>
-            )}
+              {/* Patient Complaint Collapsible Section */}
+              {(() => {
+                if (showPatientComplaint) {
+                  return (
+                    <View>
+                      <TextInput
+                        className="bg-purple-200 w-full h-24 rounded-md px-4 pt-3 text-black mb-1"
+                        value={complaint}
+                        onChangeText={setComplaint}
+                        placeholder="Enter Patient Complain if any"
+                        placeholderTextColor="#4B5563"
+                        multiline
+                        returnKeyType="done"
+                      />
+                    </View>
+                  );
+                }
+              })()}
+
+              <TouchableOpacity
+                className="bg-purple-400 p-3 rounded-md mb-1 mt-5"
+                onPress={() => {
+                  setShowObstetricHistory(!showObstetricHistory);
+                }}
+              >
+                <Text className="text-lg font-semibold text-black">
+                  {(() => {
+                    if (showObstetricHistory) {
+                      return "▼ Obstetric History";
+                    } else {
+                      return "▶ Obstetric History";
+                    }
+                  })()}
+                </Text>
+              </TouchableOpacity>
+
+              {(() => {
+                if (showObstetricHistory) {
+                  return (
+                    <>
+                      <View style={{ paddingHorizontal: 4 }}>
+                        <TextInput
+                          style={{
+                            backgroundColor: "#E9D5FF", // bg-purple-200 equivalent
+                            width: "100%",
+                            borderRadius: 6,
+                            paddingHorizontal: 16,
+                            color: "black",
+                            marginBottom: 12,
+                            height: 48,
+                            fontSize: Platform.OS === "ios" ? 16 : 14,
+                          }}
+                          value={year}
+                          onChangeText={setYear}
+                          placeholder="Year"
+                          placeholderTextColor="#6B7280"
+                          keyboardType="numeric"
+                          returnKeyType="next"
+                        />
+
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: "#E9D5FF",
+                            borderRadius: 6,
+                            marginBottom: 12,
+                            paddingHorizontal: 16,
+                            justifyContent: "center",
+                            height: 48,
+                          }}
+                          onPress={() => setTermModalVisible(true)}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={{ color: "#374151" }}>
+                            {isFullTerm ? "Full Term" : "Preterm"}
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: "#E9D5FF",
+                            borderRadius: 6,
+                            marginBottom: 12,
+                            paddingHorizontal: 16,
+                            justifyContent: "center",
+                            height: 48,
+                          }}
+                          onPress={() => setDeliveryModalVisible(true)}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={{ color: "#374151" }}>
+                            {modeOfDelivery || "Mode of Delivery"}
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TextInput
+                          style={{
+                            backgroundColor: "#E9D5FF",
+                            width: "100%",
+                            borderRadius: 6,
+                            paddingHorizontal: 16,
+                            color: "black",
+                            marginBottom: 12,
+                            minHeight: 80,
+                            textAlignVertical: "top",
+                            paddingTop: 12,
+                            fontSize: Platform.OS === "ios" ? 16 : 14,
+                          }}
+                          value={complications}
+                          onChangeText={setComplications}
+                          placeholder="Complications (if any)"
+                          placeholderTextColor="#6B7280"
+                          multiline
+                          numberOfLines={3}
+                          returnKeyType="next"
+                        />
+
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: "#E9D5FF",
+                            borderRadius: 6,
+                            marginBottom: 12,
+                            paddingHorizontal: 16,
+                            justifyContent: "center",
+                            height: 48,
+                          }}
+                          onPress={() => setGenderModalVisible(true)}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={{ color: "#374151" }}>
+                            {gender || "Gender"}
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: "#E9D5FF",
+                            borderRadius: 6,
+                            marginBottom: 12,
+                            paddingHorizontal: 16,
+                            justifyContent: "center",
+                            height: 48,
+                          }}
+                          onPress={() => setStatusModalVisible(true)}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={{ color: "#374151" }}>
+                            {status || "Status"}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+
+                      {/* Term Modal */}
+                      <Modal
+                        visible={termModalVisible}
+                        transparent={true}
+                        animationType="slide"
+                        onRequestClose={() => setTermModalVisible(false)}
+                      >
+                        <TouchableOpacity
+                          style={{
+                            flex: 1,
+                            justifyContent: "flex-end",
+                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                          }}
+                          activeOpacity={1}
+                          onPress={() => setTermModalVisible(false)}
+                        >
+                          <View
+                            style={{
+                              backgroundColor: "white",
+                              borderTopLeftRadius: 24,
+                              borderTopRightRadius: 24,
+                              padding: 16,
+                            }}
+                          >
+                            <TouchableOpacity
+                              style={{ padding: 16 }}
+                              onPress={() => {
+                                setIsFullTerm(true);
+                                setTermModalVisible(false);
+                              }}
+                            >
+                              <Text style={{ fontSize: 18 }}>Full Term</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={{ padding: 16 }}
+                              onPress={() => {
+                                setIsFullTerm(false);
+                                setTermModalVisible(false);
+                              }}
+                            >
+                              <Text style={{ fontSize: 18 }}>Preterm</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={{
+                                padding: 16,
+                                backgroundColor: "#E5E7EB",
+                                borderRadius: 8,
+                                marginTop: 16,
+                              }}
+                              onPress={() => setTermModalVisible(false)}
+                            >
+                              <Text style={{ textAlign: "center" }}>
+                                Cancel
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        </TouchableOpacity>
+                      </Modal>
+
+                      {/* Delivery Mode Modal */}
+                      <Modal
+                        visible={deliveryModalVisible}
+                        transparent={true}
+                        animationType="slide"
+                        onRequestClose={() => setDeliveryModalVisible(false)}
+                      >
+                        <TouchableOpacity
+                          style={{
+                            flex: 1,
+                            justifyContent: "flex-end",
+                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                          }}
+                          activeOpacity={1}
+                          onPress={() => setDeliveryModalVisible(false)}
+                        >
+                          <View
+                            style={{
+                              backgroundColor: "white",
+                              borderTopLeftRadius: 24,
+                              borderTopRightRadius: 24,
+                              padding: 16,
+                            }}
+                          >
+                            {["SVD", "C-Section", "Forceps", "Vacuum"].map(
+                              (mode) => (
+                                <TouchableOpacity
+                                  key={mode}
+                                  style={{ padding: 16 }}
+                                  onPress={() => {
+                                    setModeOfDelivery(mode);
+                                    setDeliveryModalVisible(false);
+                                  }}
+                                >
+                                  <Text style={{ fontSize: 18 }}>{mode}</Text>
+                                </TouchableOpacity>
+                              )
+                            )}
+                            <TouchableOpacity
+                              style={{
+                                padding: 16,
+                                backgroundColor: "#E5E7EB",
+                                borderRadius: 8,
+                                marginTop: 16,
+                              }}
+                              onPress={() => setDeliveryModalVisible(false)}
+                            >
+                              <Text style={{ textAlign: "center" }}>
+                                Cancel
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        </TouchableOpacity>
+                      </Modal>
+
+                      {/* Gender Modal */}
+                      <Modal
+                        visible={genderModalVisible}
+                        transparent={true}
+                        animationType="slide"
+                        onRequestClose={() => setGenderModalVisible(false)}
+                      >
+                        <TouchableOpacity
+                          style={{
+                            flex: 1,
+                            justifyContent: "flex-end",
+                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                          }}
+                          activeOpacity={1}
+                          onPress={() => setGenderModalVisible(false)}
+                        >
+                          <View
+                            style={{
+                              backgroundColor: "white",
+                              borderTopLeftRadius: 24,
+                              borderTopRightRadius: 24,
+                              padding: 16,
+                            }}
+                          >
+                            <TouchableOpacity
+                              style={{ padding: 16 }}
+                              onPress={() => {
+                                setGender("Female");
+                                setGenderModalVisible(false);
+                              }}
+                            >
+                              <Text style={{ fontSize: 18 }}>Female</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={{ padding: 16 }}
+                              onPress={() => {
+                                setGender("Male");
+                                setGenderModalVisible(false);
+                              }}
+                            >
+                              <Text style={{ fontSize: 18 }}>Male</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={{
+                                padding: 16,
+                                backgroundColor: "#E5E7EB",
+                                borderRadius: 8,
+                                marginTop: 16,
+                              }}
+                              onPress={() => setGenderModalVisible(false)}
+                            >
+                              <Text style={{ textAlign: "center" }}>
+                                Cancel
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        </TouchableOpacity>
+                      </Modal>
+
+                      {/* Status Modal */}
+                      <Modal
+                        visible={statusModalVisible}
+                        transparent={true}
+                        animationType="slide"
+                        onRequestClose={() => setStatusModalVisible(false)}
+                      >
+                        <TouchableOpacity
+                          style={{
+                            flex: 1,
+                            justifyContent: "flex-end",
+                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                          }}
+                          activeOpacity={1}
+                          onPress={() => setStatusModalVisible(false)}
+                        >
+                          <View
+                            style={{
+                              backgroundColor: "white",
+                              borderTopLeftRadius: 24,
+                              borderTopRightRadius: 24,
+                              padding: 16,
+                            }}
+                          >
+                            <TouchableOpacity
+                              style={{ padding: 16 }}
+                              onPress={() => {
+                                setStatus("Alive");
+                                setStatusModalVisible(false);
+                              }}
+                            >
+                              <Text style={{ fontSize: 18 }}>Alive</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={{ padding: 16 }}
+                              onPress={() => {
+                                setStatus("Still Birth");
+                                setStatusModalVisible(false);
+                              }}
+                            >
+                              <Text style={{ fontSize: 18 }}>Still Birth</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={{
+                                padding: 16,
+                                backgroundColor: "#E5E7EB",
+                                borderRadius: 8,
+                                marginTop: 16,
+                              }}
+                              onPress={() => setStatusModalVisible(false)}
+                            >
+                              <Text style={{ textAlign: "center" }}>
+                                Cancel
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        </TouchableOpacity>
+                      </Modal>
+                    </>
+                  );
+                } else {
+                  return null;
+                }
+              })()}
+
+              <TouchableOpacity
+                className="bg-purple-400 p-3 rounded-md mb-1 mt-5"
+                onPress={() => {
+                  setShowGyneHistory(!showGyneHistory);
+                }}
+              >
+                {/* Gyne Data drop down */}
+                <Text className="text-lg font-semibold text-black">
+                  {(() => {
+                    if (showGyneHistory) {
+                      return "▼ Patient Gyne Info";
+                    } else {
+                      return "▶ Patient Gyne Info";
+                    }
+                  })()}
+                </Text>
+              </TouchableOpacity>
+
+              {(() => {
+                const [complicationsGyne, setComplicationsGyne] =
+                  useState("None");
+
+                if (!showGyneHistory) return null;
+
+                const modalConfig = [
+                  {
+                    key: "menstrualCycle",
+                    label: "Menstrual Cycle",
+                    value: menstrualCycle,
+                    setter: setMenstrualCycle,
+                    visible: menstrualCycleModalVisible,
+                    setVisible: setMenstrualCycleModalVisible,
+                    options: ["Regular", "Irregular"],
+                  },
+                  {
+                    key: "pcos",
+                    label: "PCOS",
+                    value: pcos ? "Yes" : "No",
+                    setter: setPcos,
+                    visible: pcosModalVisible,
+                    setVisible: setPcosModalVisible,
+                    options: [true, false],
+                    labels: ["Yes", "No"],
+                  },
+                  {
+                    key: "fibroids",
+                    label: "Fibroids",
+                    value: fibroids ? "Yes" : "No",
+                    setter: setFibroids,
+                    visible: fibroidsModalVisible,
+                    setVisible: setFibroidsModalVisible,
+                    options: [true, false],
+                    labels: ["Yes", "No"],
+                  },
+                  {
+                    key: "menopause",
+                    label: "Menopause",
+                    value: menopause ? "Yes" : "No",
+                    setter: setMenopause,
+                    visible: menopauseModalVisible,
+                    setVisible: setMenopauseModalVisible,
+                    options: [true, false],
+                    labels: ["Yes", "No"],
+                  },
+                  {
+                    key: "postSterilization",
+                    label: "Post Sterilization",
+                    value: postSterilization ? "Yes" : "No",
+                    setter: setPostSterilization,
+                    visible: postSterilizationModalVisible,
+                    setVisible: setPostSterilizationModalVisible,
+                    options: [true, false],
+                    labels: ["Yes", "No"],
+                  },
+                  {
+                    key: "contraception",
+                    label: "Contraception",
+                    value: contraception,
+                    setter: setContraception,
+                    visible: contraceptionModalVisible,
+                    setVisible: setContraceptionModalVisible,
+                    options: [
+                      "None",
+                      "Oral Pills",
+                      "IUD",
+                      "Condoms",
+                      "Injectable",
+                      "Implant",
+                      "Sterilization",
+                    ],
+                  },
+                ];
+
+                const buttonStyle = {
+                  backgroundColor: "#E9D5FF",
+                  borderRadius: 6,
+                  marginBottom: 12,
+                  paddingHorizontal: 16,
+                  justifyContent: "center",
+                  height: 48,
+                };
+                const textStyle = { color: "#374151" };
+                const modalOverlayStyle = {
+                  flex: 1,
+                  justifyContent: "flex-end",
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                };
+                const modalContentStyle = {
+                  backgroundColor: "white",
+                  borderTopLeftRadius: 24,
+                  borderTopRightRadius: 24,
+                  padding: 16,
+                };
+                const optionStyle = { padding: 16 };
+                const optionTextStyle = { fontSize: 18 };
+                const cancelButtonStyle = {
+                  padding: 16,
+                  backgroundColor: "#E5E7EB",
+                  borderRadius: 8,
+                  marginTop: 16,
+                };
+
+                return (
+                  <>
+                    <View style={{ paddingHorizontal: 4 }}>
+                      {modalConfig.map(({ key, label, value }) => (
+                        <TouchableOpacity
+                          key={key}
+                          style={buttonStyle}
+                          onPress={() =>
+                            modalConfig
+                              .find((m) => m.key === key)
+                              .setVisible(true)
+                          }
+                          activeOpacity={0.7}
+                        >
+                          <Text style={textStyle}>
+                            {label}: {value}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+
+                      {/* Complications Input Field */}
+                      <View style={{ marginBottom: 12 }}>
+                        <Text
+                          style={{
+                            ...textStyle,
+                            marginBottom: 8,
+                            fontSize: 16,
+                            fontWeight: "500",
+                          }}
+                        >
+                          Complications:
+                        </Text>
+                        <TextInput
+                          style={{
+                            backgroundColor: "#E9D5FF",
+                            borderRadius: 6,
+                            paddingHorizontal: 16,
+                            height: 48,
+                            color: "#374151",
+                            fontSize: 16,
+                          }}
+                          value={complicationsGyne}
+                          onChangeText={setComplicationsGyne}
+                          placeholder="Enter complications (if any)"
+                          placeholderTextColor="#9CA3AF"
+                        />
+                      </View>
+                    </View>
+
+                    {modalConfig.map(
+                      ({
+                        key,
+                        label,
+                        visible,
+                        setVisible,
+                        options,
+                        setter,
+                        labels,
+                      }) => (
+                        <Modal
+                          key={key}
+                          visible={visible}
+                          transparent
+                          animationType="slide"
+                          onRequestClose={() => setVisible(false)}
+                        >
+                          <TouchableOpacity
+                            style={modalOverlayStyle}
+                            activeOpacity={1}
+                            onPress={() => setVisible(false)}
+                          >
+                            <View style={modalContentStyle}>
+                              {options.map((option, index) => (
+                                <TouchableOpacity
+                                  key={index}
+                                  style={optionStyle}
+                                  onPress={() => {
+                                    setter(option);
+                                    setVisible(false);
+                                  }}
+                                >
+                                  <Text style={optionTextStyle}>
+                                    {labels ? labels[index] : option}
+                                  </Text>
+                                </TouchableOpacity>
+                              ))}
+                              <TouchableOpacity
+                                style={cancelButtonStyle}
+                                onPress={() => setVisible(false)}
+                              >
+                                <Text style={{ textAlign: "center" }}>
+                                  Cancel
+                                </Text>
+                              </TouchableOpacity>
+                            </View>
+                          </TouchableOpacity>
+                        </Modal>
+                      )
+                    )}
+                  </>
+                );
+              })()}
+
+              {/*Period Details*/}
+              <TouchableOpacity
+                className="bg-purple-400 p-3 rounded-md mb-1 mt-5"
+                onPress={() => {
+                  setShowLastMontPeriod(!showLastMontPeriod);
+                }}
+              >
+                <Text className="text-lg font-semibold text-black">
+                  {(() => {
+                    if (showLastMontPeriod) {
+                      return "▼ Last Month Period";
+                    } else {
+                      return "▶ Last Month Period";
+                    }
+                  })()}
+                </Text>
+              </TouchableOpacity>
+
+              {(() => {
+                if (showLastMontPeriod) {
+                  return (
+                    <>
+                      <View style={{ paddingHorizontal: 4 }}>
+                        {/* Last Month Period */}
+                        <View style={{ marginBottom: 12 }}>
+                          <Text
+                            style={{
+                              color: "#374151",
+                              marginBottom: 8,
+                              fontSize: 16,
+                              fontWeight: "500",
+                            }}
+                          >
+                            Last Month Period:
+                          </Text>
+                          <TextInput
+                            style={{
+                              backgroundColor: "#E9D5FF",
+                              borderRadius: 6,
+                              paddingHorizontal: 16,
+                              height: 48,
+                              color: "#374151",
+                              fontSize: 16,
+                            }}
+                            value={LastMonthPeriod}
+                            onChangeText={setLastMonthPeriod}
+                            placeholder="Enter date"
+                            placeholderTextColor="#9CA3AF"
+                          />
+                        </View>
+
+                        {/* Expected Date of Delivery */}
+                        <View style={{ marginBottom: 12 }}>
+                          <Text
+                            style={{
+                              color: "#374151",
+                              marginBottom: 8,
+                              fontSize: 16,
+                              fontWeight: "500",
+                            }}
+                          >
+                            Expected Date of Delivery:
+                          </Text>
+                          <TextInput
+                            style={{
+                              backgroundColor: "#E9D5FF",
+                              borderRadius: 6,
+                              paddingHorizontal: 16,
+                              height: 48,
+                              color: "#374151",
+                              fontSize: 16,
+                            }}
+                            value={ExpectedDateOfDelievery}
+                            onChangeText={setExpectedDateOfDelievery}
+                            placeholder="Enter date"
+                            placeholderTextColor="#9CA3AF"
+                          />
+                        </View>
+                      </View>
+                    </>
+                  );
+                } else {
+                  return null;
+                }
+              })()}
+              {/* Save Button */}
+              <TouchableOpacity className="bg-green-500 p-4 rounded-md mt-6">
+                <Text className="text-lg font-semibold text-white text-center">
+                  Save Form
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-
-            
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 };

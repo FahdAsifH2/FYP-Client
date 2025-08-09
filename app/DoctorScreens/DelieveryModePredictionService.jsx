@@ -207,7 +207,7 @@ const DeliveryModePredictionForm = () => {
                   <Text
                     className={`text-base ${
                       currentValue === option.value
-                        ? "text-blue-600 font-semibold"
+                        ? "text-purple-600 font-semibold"
                         : "text-gray-700"
                     }`}
                   >
@@ -391,11 +391,11 @@ const DeliveryModePredictionForm = () => {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-gray-50"
+      className="flex-1 bg-zinc-900"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       {/* Header */}
-      <View className="bg-blue-500 pt-12 pb-6 px-4">
+      <View className="bg-purple-600 pt-10 pb-2 px-4">
         <Text className="text-2xl font-bold text-white text-center">
           Delivery Prediction
         </Text>
@@ -620,7 +620,7 @@ const DeliveryModePredictionForm = () => {
         {/* Predict Button */}
         <TouchableOpacity
           className={`mt-6 rounded-lg py-4 px-6 ${
-            loading ? "bg-gray-400" : "bg-blue-500"
+            loading ? "bg-gray-400" : "bg-purple-600"
           }`}
           onPress={predict}
           disabled={loading}
