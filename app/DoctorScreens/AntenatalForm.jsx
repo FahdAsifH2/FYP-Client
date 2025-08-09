@@ -8,15 +8,17 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Modal,
+  Alert,
   Platform,
 } from "react-native";
+import { format } from "date-fns";
 import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 import Background from "../components/Background";
-
+import Icon from "react-native-vector-icons/FontAwesome";
 const AntenatalForm = () => {
   const [showPatientInfo, setShowPatientInfo] = useState(false);
   const [showPatientIdentification, setShowPatientIdentification] =
@@ -106,6 +108,84 @@ const AntenatalForm = () => {
     thyroid: false,
     others: false,
   });
+
+  //details
+  const [showPhysicalExam, setShowPhysicalExam] = useState(false);
+  const [pallor, setPallor] = useState("");
+  const [thyroid, setThyroid] = useState("");
+  const [edema, setEdema] = useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
+  const [bloodPressure, setBloodPressure] = useState("");
+
+  const calculateBMI = () => {
+    if (!height || !weight) return "N/A";
+    const heightInMeters = parseFloat(height) / 100;
+    return (parseFloat(weight) / (heightInMeters * heightInMeters)).toFixed(1);
+  };
+
+  //gyen visits
+  const [showAntenatalVisits, setShowAntenatalVisits] = useState(false);
+  const [showVisitDatePicker, setShowVisitDatePicker] = useState(false);
+  const [visits, setVisits] = useState({
+    bookingScanDone: false,
+    ntScanDone: false,
+    anomalyScanDone: false,
+    weeks28Done: false,
+    weeks34Done: false,
+    termDone: false,
+    edd: "",
+    presentation: "",
+    positionStation: "",
+    bimanualFindings: "",
+    visitDate: null,
+  });
+  const [antenatalVisits, setAntenatalVisits] = useState({
+    firstVisit: false,
+    secondVisit: false,
+    thirdVisit: false,
+    fourthVisit: false,
+    fifthVisit: false,
+    sixthVisit: false,
+    additionalVisits: false,
+  });
+  const VisitInputField = ({ label, value, onChange, placeholder }) => (
+    <View className="flex-row items-center mb-2">
+      <Text className="text-gray-600 w-16">{label}</Text>
+      <TextInput
+        value={value}
+        onChangeText={onChange}
+        className="border border-purple-500 rounded p-2 text-gray-700 flex-1"
+        placeholder={placeholder}
+      />
+    </View>
+  );
+  const VisitSection = ({ label, checked, onToggle, children }) => (
+    <View className="mb-3">
+      <TouchableOpacity
+        onPress={onToggle}
+        className="flex-row items-center mb-2"
+      >
+        <Checkbox checked={checked} />
+        <Text className="text-gray-700 font-medium ml-2">{label}</Text>
+      </TouchableOpacity>
+      {checked && <View className="ml-6">{children}</View>}
+    </View>
+  );
+  const updateVisit = (key, value) => {
+    setVisits((prev) => ({
+      ...prev,
+      [key]: value, // immutably update text fields
+    }));
+  };
+  const Checkbox = ({ checked }) => (
+    <View
+      className={`w-5 h-5 rounded-md border-2 border-purple-500 
+      ${checked ? "bg-purple-500" : "bg-transparent"} items-center justify-center`}
+    >
+      {checked && <Text className="text-white">✓</Text>}
+    </View>
+  );
 
   return (
     <View className="flex-1">
@@ -1077,8 +1157,432 @@ const AntenatalForm = () => {
                   ))}
                 </View>
               )}
+
+              {/* Medial Historhy*/}
+              <TouchableOpacity
+                className="bg-purple-400 p-3 rounded-md mb-1 mt-5"
+                onPress={() => {
+                  setShowMedicalHistory(!showMedicalHistory);
+                }}
+              >
+                <Text className="text-lg font-semibold text-black">
+                  {(() => {
+                    if (showMedicalHistory) {
+                      return "▼ Last Month Period";
+                    } else {
+                      return "▶ Last Month Period";
+                    }
+                  })()}
+                </Text>
+              </TouchableOpacity>
+
+              {showMedicalHistory && (
+                <View
+                  style={{
+                    backgroundColor: "#E9D5FF",
+                    padding: 12,
+                    borderRadius: 6,
+                  }}
+                >
+                  {[
+                    { label: "Drug Allergy", key: "drugAllergy" },
+                    { label: "Chicken Pox", key: "chickenPox" },
+                    { label: "HTN", key: "htn" },
+                    { label: "DM", key: "dm" },
+                    { label: "Thyroid", key: "thyroid" },
+                    { label: "Others", key: "others" },
+                  ].map((item) => (
+                    <TouchableOpacity
+                      key={item.key}
+                      onPress={() =>
+                        setMedicalHistory((prev) => ({
+                          ...prev,
+                          [item.key]: !prev[item.key],
+                        }))
+                      }
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginBottom: 8,
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <View
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: 4,
+                          borderWidth: 2,
+                          borderColor: "#8B5CF6",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: medicalHistory[item.key]
+                            ? "#8B5CF6"
+                            : "transparent",
+                        }}
+                      >
+                        {medicalHistory[item.key] && (
+                          <Text
+                            style={{
+                              color: "white",
+                              fontSize: 14,
+                              fontWeight: "bold",
+                            }}
+                          >
+                            ✓
+                          </Text>
+                        )}
+                      </View>
+                      <Text style={{ marginLeft: 8, color: "#374151" }}>
+                        {item.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+              {/* Physical Examination */}
+              <TouchableOpacity
+                className="bg-purple-400 p-3 rounded-md mb-1 mt-5"
+                onPress={() => setShowPhysicalExam(!showPhysicalExam)}
+              >
+                <Text className="text-lg font-semibold text-black">
+                  {showPhysicalExam
+                    ? "▼ Physical Examination"
+                    : "▶ Physical Examination"}
+                </Text>
+              </TouchableOpacity>
+              {showPhysicalExam && (
+                <View
+                  style={{
+                    backgroundColor: "#F3E8FF",
+                    padding: 12,
+                    borderRadius: 6,
+                  }}
+                >
+                  {/* Checkboxes Section */}
+                  <View style={{ marginBottom: 16 }}>
+                    {[
+                      {
+                        label: "Pallor",
+                        key: "pallor",
+                        options: ["Present", "Absent"],
+                        setter: setPallor,
+                        value: pallor,
+                      },
+                      {
+                        label: "Thyroid",
+                        key: "thyroid",
+                        options: ["Normal", "Enlarged"],
+                        setter: setThyroid,
+                        value: thyroid,
+                      },
+                      {
+                        label: "Edema",
+                        key: "edema",
+                        options: ["Present", "Absent"],
+                        setter: setEdema,
+                        value: edema,
+                      },
+                    ].map((item) => (
+                      <View key={item.key} style={{ marginBottom: 12 }}>
+                        <Text style={{ color: "#374151", marginBottom: 4 }}>
+                          {item.label}:
+                        </Text>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-around",
+                          }}
+                        >
+                          {item.options.map((option) => (
+                            <TouchableOpacity
+                              key={option}
+                              onPress={() => item.setter(option)}
+                              style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                              }}
+                              activeOpacity={0.7}
+                            >
+                              <View
+                                style={{
+                                  width: 16,
+                                  height: 16,
+                                  borderRadius: 8,
+                                  borderWidth: 2,
+                                  borderColor: "#8B5CF6",
+                                  marginRight: 6,
+                                  backgroundColor:
+                                    item.value === option
+                                      ? "#8B5CF6"
+                                      : "transparent",
+                                }}
+                              />
+                              <Text style={{ color: "#374151" }}>{option}</Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+
+                  {/* Input Fields Section */}
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      marginBottom: 12,
+                    }}
+                  >
+                    <View style={{ width: "32%" }}>
+                      <Text style={{ color: "#374151", marginBottom: 4 }}>
+                        Ht (cm):
+                      </Text>
+                      <TextInput
+                        value={height}
+                        onChangeText={setHeight}
+                        keyboardType="numeric"
+                        style={{
+                          borderWidth: 1,
+                          borderColor: "#8B5CF6",
+                          borderRadius: 4,
+                          padding: 8,
+                          color: "#374151",
+                        }}
+                        placeholder="Height"
+                        placeholderTextColor="#9CA3AF"
+                      />
+                    </View>
+                    <View style={{ width: "32%" }}>
+                      <Text style={{ color: "#374151", marginBottom: 4 }}>
+                        Wt (kg):
+                      </Text>
+                      <TextInput
+                        value={weight}
+                        onChangeText={setWeight}
+                        keyboardType="numeric"
+                        style={{
+                          borderWidth: 1,
+                          borderColor: "#8B5CF6",
+                          borderRadius: 4,
+                          padding: 8,
+                          color: "#374151",
+                        }}
+                        placeholder="Weight"
+                        placeholderTextColor="#9CA3AF"
+                      />
+                    </View>
+                    <View style={{ width: "32%" }}>
+                      <Text style={{ color: "#374151", marginBottom: 4 }}>
+                        BMI:
+                      </Text>
+                      <Text
+                        style={{
+                          borderWidth: 1,
+                          borderColor: "#8B5CF6",
+                          borderRadius: 4,
+                          padding: 8,
+                          color: "#374151",
+                          backgroundColor: "#F3E8FF",
+                        }}
+                      >
+                        {calculateBMI()}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Blood Pressure - Full Width */}
+                  <View>
+                    <Text style={{ color: "#374151", marginBottom: 4 }}>
+                      B.P. (mmHg):
+                    </Text>
+                    <TextInput
+                      value={bloodPressure}
+                      onChangeText={setBloodPressure}
+                      style={{
+                        borderWidth: 1,
+                        borderColor: "#8B5CF6",
+                        borderRadius: 4,
+                        padding: 8,
+                        color: "#374151",
+                      }}
+                      placeholder="e.g. 120/80"
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </View>
+                </View>
+              )}
+
+              {/* Antenatal Visits */}
+              <TouchableOpacity
+                className="bg-purple-400 p-3 rounded-md mb-1 mt-5"
+                onPress={() => setShowAntenatalVisits(!showAntenatalVisits)}
+              >
+                <Text className="text-lg font-semibold text-black">
+                  {showAntenatalVisits
+                    ? "▼ Antenatal Visits"
+                    : "▶ Antenatal Visits"}
+                </Text>
+              </TouchableOpacity>
+
+              {showAntenatalVisits && (
+                <View
+                  style={{
+                    backgroundColor: "#E9D5FF",
+                    padding: 12,
+                    borderRadius: 6,
+                  }}
+                >
+                  {[
+                    { label: "Booking Scan:", key: "bookingScan" },
+                    { label: "NT Scan:", key: "ntScan" },
+                    { label: "Anomaly Scan:", key: "anomalyScan" },
+                    { label: "28 Weeks:", key: "twentyEightWeeks" },
+                    { label: "34 Weeks:", key: "thirtyFourWeeks" },
+                    { label: "Term:", key: "term" },
+                  ].map((item) => (
+                    <TouchableOpacity
+                      key={item.key}
+                      onPress={() => toggleCheckbox(item.key)}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginBottom: 8,
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <View
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: 4,
+                          borderWidth: 2,
+                          borderColor: "#8B5CF6",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: history[item.key]
+                            ? "#8B5CF6"
+                            : "transparent",
+                        }}
+                      >
+                        {history[item.key] && (
+                          <Text
+                            style={{
+                              color: "white",
+                              fontSize: 14,
+                              fontWeight: "bold",
+                            }}
+                          >
+                            ✓
+                          </Text>
+                        )}
+                      </View>
+                      <Text style={{ marginLeft: 8, color: "#374151" }}>
+                        {item.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
               {/* Save Button */}
-              <TouchableOpacity className="bg-green-500 p-4 rounded-md mt-6">
+              <TouchableOpacity
+                className="bg-green-500 p-4 rounded-md mt-6"
+                onPress={() => {
+                  console.log({
+                    // Patient Info
+                    patientInfo: {
+                      patientName,
+                      age,
+                      marriedSince,
+                      isCousinMarriage,
+                      referredBy,
+                      date,
+                    },
+
+                    // Patient Identification
+                    patientIdentification: {
+                      relation,
+                      address,
+                      telephone,
+                      bloodGroup,
+                      husbandName,
+                      emergencyContact,
+                      occupation,
+                    },
+
+                    // Patient Complaint
+                    complaint,
+
+                    // Obstetric History
+                    obstetricHistory: {
+                      year,
+                      isFullTerm,
+                      modeOfDelivery,
+                      complications,
+                      gender,
+                      status,
+                      modals: {
+                        termModalVisible,
+                        deliveryModalVisible,
+                        genderModalVisible,
+                        statusModalVisible,
+                      },
+                      showGyneHistory,
+                    },
+
+                    // Gynecological History
+                    gynecologicalHistory: {
+                      menstrualCycle,
+                      pcos,
+                      fibroids,
+                      menopause,
+                      postSterilization,
+                      contraception,
+                      complicationsGyne,
+                      modals: {
+                        menstrualCycleModalVisible,
+                        pcosModalVisible,
+                        fibroidsModalVisible,
+                        menopauseModalVisible,
+                        postSterilizationModalVisible,
+                        contraceptionModalVisible,
+                      },
+                    },
+
+                    // Pregnancy Data
+                    pregnancyData: {
+                      LastMonthPeriod,
+                      ExpectedDateOfDelievery,
+                    },
+
+                    // Family History
+                    familyHistory: history,
+
+                    // Medical History
+                    medicalHistory,
+
+                    // Physical Exam
+                    physicalExam: {
+                      showPhysicalExam,
+                      pallor,
+                      thyroid,
+                      edema,
+                      height,
+                      weight,
+                      bloodPressure,
+                      bmi: calculateBMI(),
+                    },
+
+                    // Antenatal Visits
+                    antenatalVisits: {
+                      showAntenatalVisits,
+                      showVisitDatePicker,
+                      visits,
+                    },
+                  });
+                  Alert.alert("Test", "Button pressed!"); // Add this temporary alert
+                }}
+              >
                 <Text className="text-lg font-semibold text-white text-center">
                   Save Form
                 </Text>
