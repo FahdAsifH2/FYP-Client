@@ -3,8 +3,8 @@ export const config = {
 
 //PLEASE REPLACE IP ADDRESS WITH UR IP ADDRESS
 //IN CMD RUN ipconfig and replace the IP address below with ur IPv4 address
-  EXPRESS_API_URL: process.env.EXPRESS_API_URL || 'http://192.168.194.42:5001',
-  FASTAPI_MODEL_URL: process.env.FASTAPI_MODEL_URL || 'http://192.168.194.42:8000',
+  EXPRESS_API_URL: 'http://192.168.100.108:5001',
+  FASTAPI_MODEL_URL: 'http://192.168.100.108:8000',
   
   ALTERNATIVE_URLS: [
     process.env.FASTAPI_MODEL_URL || 'http://192.168.194.42:8000',
