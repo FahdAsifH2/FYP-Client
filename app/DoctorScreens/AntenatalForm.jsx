@@ -24,7 +24,8 @@ const AntenatalForm = () => {
   const [showPatientComplaint, setShowPatientComplaint] = useState(false);
   const [showObstetricHistory, setShowObstetricHistory] = useState(false);
   const [showLastMontPeriod, setShowLastMontPeriod] = useState(false);
-
+  const [showFamilyHistory, setShowFamilyHistory] = useState(false);
+  const [showMedicalHistory, setShowMedicalHistory] = useState(false);
   // Patient Info states
   const [patientName, setPatientName] = useState("");
   const [age, setAge] = useState("");
@@ -82,6 +83,29 @@ const AntenatalForm = () => {
   //Pregnancu data
   const [LastMonthPeriod, setLastMonthPeriod] = useState(date);
   const [ExpectedDateOfDelievery, setExpectedDateOfDelievery] = useState(date);
+
+  //Family Hisotry
+  const [history, setHistory] = useState({
+    dm: false,
+    htn: false,
+    cancer: false,
+    twins: false,
+    specialChild: false,
+    thalassemia: false,
+  });
+  const toggleCheckbox = (name) => {
+    setHistory((prev) => ({ ...prev, [name]: !prev[name] }));
+  };
+
+  //Medical history
+  const [medicalHistory, setMedicalHistory] = useState({
+    drugAllergy: false,
+    chickenPox: false,
+    htn: false,
+    dm: false,
+    thyroid: false,
+    others: false,
+  });
 
   return (
     <View className="flex-1">
@@ -982,6 +1006,77 @@ const AntenatalForm = () => {
                   return null;
                 }
               })()}
+
+              {/*Family History*/}
+              <TouchableOpacity
+                className="bg-purple-400 p-3 rounded-md mb-1 mt-5"
+                onPress={() => {
+                  setShowFamilyHistory(!showFamilyHistory);
+                }}
+              >
+                <Text className="text-lg font-semibold text-black">
+                  {showFamilyHistory ? "▼ Family History" : "▶ Family History"}
+                </Text>
+              </TouchableOpacity>
+              {showFamilyHistory && (
+                <View
+                  style={{
+                    backgroundColor: "#E9D5FF",
+                    padding: 12,
+                    borderRadius: 6,
+                  }}
+                >
+                  {[
+                    { label: "DM", key: "dm" },
+                    { label: "HTN", key: "htn" },
+                    { label: "Cancer", key: "cancer" },
+                    { label: "Twins", key: "twins" },
+                    { label: "Special Child", key: "specialChild" },
+                    { label: "Thalassemia", key: "thalassemia" },
+                  ].map((item) => (
+                    <TouchableOpacity
+                      key={item.key}
+                      onPress={() => toggleCheckbox(item.key)}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginBottom: 8,
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <View
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: 4,
+                          borderWidth: 2,
+                          borderColor: "#8B5CF6",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: history[item.key]
+                            ? "#8B5CF6"
+                            : "transparent",
+                        }}
+                      >
+                        {history[item.key] && (
+                          <Text
+                            style={{
+                              color: "white",
+                              fontSize: 14,
+                              fontWeight: "bold",
+                            }}
+                          >
+                            ✓
+                          </Text>
+                        )}
+                      </View>
+                      <Text style={{ marginLeft: 8, color: "#374151" }}>
+                        {item.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
               {/* Save Button */}
               <TouchableOpacity className="bg-green-500 p-4 rounded-md mt-6">
                 <Text className="text-lg font-semibold text-white text-center">
