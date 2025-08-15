@@ -324,7 +324,7 @@ export default function AntenatalCardForm() {
     diagnosis: "",
     plan: "",
 
-    //investigations
+    
     pallor: "",
     thyroidNormal: true,
     thyroidNotes: "",
@@ -1114,12 +1114,12 @@ export default function AntenatalCardForm() {
                   </Text>
                 </TableCell>
                 <TableCell>
-                  <Text className="text-white text-xs font-bold text-center">
+                  <Text className="text-white text-s font-bold text-center">
                     Hb
                   </Text>
                 </TableCell>
                 <TableCell>
-                  <Text className="text-white text-xs font-bold text-center">
+                  <Text className="text-white text-s font-bold text-center">
                     BSR
                   </Text>
                 </TableCell>
@@ -1150,7 +1150,7 @@ export default function AntenatalCardForm() {
                   </TableCell>
                   <TableCell>
                     <TextInput
-                      className="text-white text-xs bg-transparent"
+                      className="text-white text-s bg-transparent"
                       value={row.date}
                       placeholder="DD/MM"
                       onChangeText={(value) =>
