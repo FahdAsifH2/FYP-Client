@@ -10,8 +10,17 @@ import {
   Alert,
 } from "react-native";
 
-const API_BASE_URL =
-  "http://192.168.31.188:5001/api/Doctors/SubmitAntenatalform";
+const getApiUrl = () => {
+  if (typeof window !== "undefined" && window.location) {
+    return "http://localhost:5001/api/Doctors";
+  }
+  if (Platform.OS === "ios" || Platform.OS === "android") {
+    return "http://172.20.10.2:5001/api/Doctors";
+  }
+  return "http://172.20.10.2:5001/api/Doctors";
+};
+
+const API_BASE_URL = getApiUrl();
 
 const anenatalAPI = {
   async saveAntenatalCard(
@@ -131,7 +140,7 @@ const anenatalAPI = {
       };
 
       const response = await fetch(
-        "http://172.20.10.2:5001/api/Doctors/SubmitAntenatalform",
+        `http://172.20.10.2:5001/api/Doctors/SubmitAntenatalform`,
         {
           method: "POST",
           headers: {
@@ -324,7 +333,6 @@ export default function AntenatalCardForm() {
     diagnosis: "",
     plan: "",
 
-    
     pallor: "",
     thyroidNormal: true,
     thyroidNotes: "",
@@ -432,7 +440,7 @@ export default function AntenatalCardForm() {
     setInvestigationRows(newRows);
   };
 
-  const handleSave = async() => {
+  const handleSave = async () => {
     // // Basic validation
     // const requiredFields = {
     //   patientName: formData.patientName,
@@ -467,7 +475,6 @@ export default function AntenatalCardForm() {
       obhRows,
       investigationRows
     );
-
 
     Alert.alert("Success", "Antenatal card saved successfully!");
   };
