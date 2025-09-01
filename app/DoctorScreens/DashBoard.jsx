@@ -408,7 +408,8 @@ const Dashboard = () => {
                 title="Appointments"
                 description="Schedule & manage"
                 icon={Icons.calendar}
-                onPress={() => console.log("Navigation to Appointments")}
+                onPress={() => handleNavigation('/DoctorScreens/AppointmentBookingForm')}
+        
                 backgroundImage={require('../DoctorAssets/appointments.jpg')}
               />
 
