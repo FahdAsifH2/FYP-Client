@@ -353,7 +353,7 @@ const DeliveryModePredictionForm = () => {
 
       // Replace with your actual API endpoint
       const response = await fetch(
-        "http://172.20.10.2:5001/api/Doctors/PredictPregnancy",
+        "http://192.168.31.188:5001/api/Doctors/PredictPregnancy",
         {
           method: "POST",
           headers: {

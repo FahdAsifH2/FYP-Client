@@ -1,336 +1,430 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, StatusBar } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StatusBar, Dimensions, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 
-// Mock data
+const { width } = Dimensions.get('window');
+
 const mockData = {
   doctor: {
-    name: 'Dr. Sarah Williams',
-    profilePic: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face',
-    greeting: 'Good Morning'
+    tagline: 'Caring for women\'s health with compassion'
   },
-  appointments: {
-    today: 8,
-    total: 24
-  },
-  insights: {
-    highRiskPregnancies: 3,
-    csectionRate: 32,
-    normalDeliveryRate: 68,
-    upcomingDueDates: [
-      { name: 'Maria Santos', date: 'Aug 18' },
-      { name: 'Lisa Chen', date: 'Aug 22' },
-      { name: 'Emma Wilson', date: 'Aug 25' }
-    ]
-  }
+  todayAppointments: [
+    { id: 1, time: '09:00 AM', patient: 'Maria Santos', type: 'Checkup' },
+    { id: 2, time: '10:30 AM', patient: 'Lisa Chen', type: 'Ultrasound' },
+    { id: 3, time: '11:15 AM', patient: 'Emma Wilson', type: 'Consultation' },
+    { id: 4, time: '02:00 PM', patient: 'Sarah Ahmed', type: 'Follow-up' },
+    { id: 5, time: '03:30 PM', patient: 'Anna Rodriguez', type: 'Checkup' },
+    { id: 6, time: '04:45 PM', patient: 'Fatima Khan', type: 'Lab Review' }
+  ]
 };
 
-// Modern Icons
 const Icons = {
-  stethoscope: '🩺',
-  calendar: '📅',
-  history: '📋',
-  records: '📁',
-  baby: '👶',
-  scale: '⚖️',
-  warning: '⚠️',
-  chart: '📊',
-  bell: '🔔',
-  stats: '📈'
+  calendar: '📅', history: '📋', records: '📁', baby: '👶', scale: '⚖️',
+  bell: '🔔', user: '👤', smile: '😊', chat: '💬', home: '🏠'
 };
 
-// Modern Vertical Card Component
-const ModernCard = ({ title, description, icon, onPress, bgColor = 'bg-white', iconBg = 'bg-purple-50' }) => (
-  <TouchableOpacity
-    onPress={onPress}
-    activeOpacity={0.8}
-    className={`${bgColor} rounded-3xl p-5 mx-5 mb-4 shadow-lg`}
-    style={{
-      shadowColor: '#A855F7',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.12,
-      shadowRadius: 12,
-      elevation: 8,
-    }}
-  >
-    {/* Icon at top */}
-    <View className={`w-14 h-14 ${iconBg} rounded-2xl items-center justify-center mb-4`}>
-      <Text className="text-3xl">{icon}</Text>
+const AppointmentRow = ({ appointment }) => (
+  <View style={{
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+  }}>
+    <View style={{
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: '#22c55e',
+      marginRight: 12,
+    }} />
+    
+    <View style={{
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 8,
+      marginRight: 12,
+      minWidth: 70,
+    }}>
+      <Text style={{
+        color: 'white',
+        fontSize: 12,
+        fontWeight: 'bold',
+        textAlign: 'center',
+      }}>
+        {appointment.time}
+      </Text>
     </View>
     
-    {/* Title */}
-    <Text className="text-lg font-bold text-gray-800 mb-2 leading-6">
-      {title}
-    </Text>
+    <View style={{ flex: 1 }}>
+      <Text style={{
+        color: 'white',
+        fontSize: 14,
+        fontWeight: 'bold',
+        marginBottom: 2,
+      }}>
+        {appointment.patient}
+      </Text>
+      <Text style={{
+        color: 'white',
+        fontSize: 12,
+        opacity: 0.7,
+      }}>
+        {appointment.type}
+      </Text>
+    </View>
     
-    {/* Description */}
-    <Text className="text-sm text-gray-500 leading-5 opacity-80">
-      {description}
-    </Text>
+    <TouchableOpacity style={{
+      backgroundColor: 'rgba(139, 92, 246, 0.3)',
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 6,
+    }}>
+      <Text style={{
+        color: 'white',
+        fontSize: 11,
+        fontWeight: 'bold',
+      }}>
+        View
+      </Text>
+    </TouchableOpacity>
+  </View>
+);
+
+const TodaysAppointmentsWidget = ({ appointments }) => (
+  <View style={{
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    marginBottom: 24,
+    overflow: 'hidden',
+  }}>
+    <View style={{
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    }}>
+      <Text style={{
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+      }}>
+        Today's Appointments
+      </Text>
+      <View style={{
+        backgroundColor: 'rgba(34, 197, 94, 0.2)',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+      }}>
+        <Text style={{
+          color: '#22c55e',
+          fontSize: 12,
+          fontWeight: 'bold',
+        }}>
+          {appointments.length} scheduled
+        </Text>
+      </View>
+    </View>
+    
+    <ScrollView 
+      style={{ maxHeight: 200 }}
+      showsVerticalScrollIndicator={false}
+    >
+      {appointments.map((appointment) => (
+        <AppointmentRow key={appointment.id} appointment={appointment} />
+      ))}
+    </ScrollView>
+  </View>
+);
+
+const DashboardCard = ({ title, description, icon, onPress, backgroundImage, isHighlight = false }) => (
+  <TouchableOpacity 
+    onPress={onPress} 
+    activeOpacity={0.8}
+    style={{ 
+      width: (width - 60) / 2, 
+      marginBottom: 16,
+      marginHorizontal: 4,
+    }}
+  >
+    <ImageBackground
+      source={backgroundImage}
+      style={{
+        borderRadius: 20,
+        overflow: 'hidden',
+        height: 140,
+      }}
+      imageStyle={{ borderRadius: 20, opacity: 0.4 }}
+    >
+      <View style={{
+        flex: 1,
+        backgroundColor: isHighlight ? 'rgba(139, 92, 246, 0.3)' : 'rgba(0, 0, 0, 0.4)',
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        padding: 16,
+        justifyContent: 'space-between',
+      }}>
+        <View style={{
+          width: 36,
+          height: 36,
+          borderRadius: 12,
+          backgroundColor: 'rgba(255, 255, 255, 0.3)',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <Text style={{ fontSize: 18 }}>{icon}</Text>
+        </View>
+        
+        <View>
+          <Text style={{
+            color: 'white',
+            fontSize: 14,
+            fontWeight: 'bold',
+            marginBottom: 4,
+            textShadowColor: 'rgba(0, 0, 0, 0.7)',
+            textShadowOffset: { width: 0, height: 1 },
+            textShadowRadius: 2,
+          }}>
+            {title}
+          </Text>
+          
+          <Text style={{
+            color: 'white',
+            fontSize: 11,
+            opacity: 0.9,
+            lineHeight: 14,
+            textShadowColor: 'rgba(0, 0, 0, 0.5)',
+            textShadowOffset: { width: 0, height: 1 },
+            textShadowRadius: 1,
+          }}>
+            {description}
+          </Text>
+        </View>
+      </View>
+    </ImageBackground>
   </TouchableOpacity>
 );
 
-// Small Insight Card
-const InsightCard = ({ title, value, subtitle, icon, color = 'purple' }) => {
-  const getColorClasses = (color) => {
-    switch(color) {
-      case 'rose': return { text: 'text-rose-500', bg: 'bg-rose-50' };
-      case 'pink': return { text: 'text-pink-500', bg: 'bg-pink-50' };
-      case 'fuchsia': return { text: 'text-fuchsia-500', bg: 'bg-fuchsia-50' };
-      default: return { text: 'text-purple-500', bg: 'bg-purple-50' };
+const ModernHeader = ({ doctor }) => (
+  <View style={{ 
+    paddingTop: (StatusBar.currentHeight || 44) + 20, 
+    paddingBottom: 24, 
+    paddingHorizontal: 24 
+  }}>
+    <View style={{ 
+      flexDirection: 'row', 
+      justifyContent: 'space-between', 
+      alignItems: 'center', 
+      marginBottom: 24 
+    }}>
+      <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>
+        GyneAI Dashboard
+      </Text>
+      
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <TouchableOpacity style={{
+          width: 36, height: 36, borderRadius: 18,
+          backgroundColor: 'rgba(255, 255, 255, 0.15)',
+          alignItems: 'center', justifyContent: 'center', marginRight: 10,
+        }}>
+          <Text style={{ fontSize: 16 }}>{Icons.bell}</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={{
+          width: 36, height: 36, borderRadius: 18,
+          backgroundColor: 'rgba(255, 255, 255, 0.15)',
+          alignItems: 'center', justifyContent: 'center',
+        }}>
+          <Text style={{ fontSize: 16 }}>{Icons.user}</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+
+    <View style={{
+      borderRadius: 20,
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      borderWidth: 1,
+      borderColor: 'rgba(255, 255, 255, 0.2)',
+      padding: 20,
+      marginBottom: 20,
+    }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{
+          width: 50, height: 50, borderRadius: 25,
+          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+          alignItems: 'center', justifyContent: 'center', marginRight: 12,
+        }}>
+          <Text style={{ fontSize: 24 }}>{Icons.user}</Text>
+        </View>
+        
+        <View style={{ flex: 1 }}>
+          <Text style={{
+            color: 'white', fontSize: 18, fontWeight: 'bold', marginBottom: 2,
+          }}>
+            Welcome, Dr. Saba Ansari
+          </Text>
+          <Text style={{ color: 'white', fontSize: 13, opacity: 0.8 }}>
+            {doctor.tagline}
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
+);
+
+const BottomTabBar = () => (
+  <View style={{
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(26, 26, 46, 0.95)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+  }}>
+    <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+      <TouchableOpacity style={{ alignItems: 'center' }}>
+        <View style={{ 
+          backgroundColor: 'rgba(139, 92, 246, 0.2)', 
+          paddingHorizontal: 12, 
+          paddingVertical: 8, 
+          borderRadius: 10 
+        }}>
+          <Text style={{ fontSize: 16 }}>{Icons.home}</Text>
+        </View>
+        <Text style={{ color: '#8b5cf6', fontSize: 10, marginTop: 4, fontWeight: '600' }}>Home</Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity style={{ alignItems: 'center' }}>
+        <Text style={{ fontSize: 16, marginBottom: 4 }}>{Icons.calendar}</Text>
+        <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 10 }}>Appointments</Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity style={{ alignItems: 'center' }}>
+        <Text style={{ fontSize: 16, marginBottom: 4 }}>{Icons.chat}</Text>
+        <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 10 }}>Patients</Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity style={{ alignItems: 'center' }}>
+        <Text style={{ fontSize: 16, marginBottom: 4 }}>{Icons.user}</Text>
+        <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 10 }}>Profile</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+);
+
+const Dashboard = () => {
+  const handleNavigation = (route) => {
+    if (route) {
+      router.push(route);
+    } else {
+      console.log("Navigation to Appointments");
     }
   };
 
-  const colorClasses = getColorClasses(color);
-
   return (
-    <View 
-      className="bg-white rounded-2xl p-4 flex-1 mx-2 shadow-lg"
-      style={{
-        shadowColor: color === 'rose' ? '#F43F5E' : color === 'pink' ? '#EC4899' : color === 'fuchsia' ? '#D946EF' : '#A855F7',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 4,
-      }}
-    >
-      <View className={`w-10 h-10 ${colorClasses.bg} rounded-xl items-center justify-center mb-3`}>
-        <Text className="text-xl">{icon}</Text>
-      </View>
-      <Text className={`text-2xl font-bold ${colorClasses.text} mb-1`}>
-        {value}
-      </Text>
-      <Text className="text-xs text-gray-500 font-semibold">
-        {title}
-      </Text>
-      {subtitle && (
-        <Text className="text-xs text-gray-400 mt-1">
-          {subtitle}
-        </Text>
-      )}
-    </View>
-  );
-};
-
-// Modern Header with elegant purple-pink gradient
-const ModernHeader = ({ doctor, appointments }) => (
-  <LinearGradient
-    colors={['#8B5CF6', '#A855F7', '#EC4899', '#F472B6']}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-    className="pt-16 pb-8 px-6"
-    style={{ paddingTop: (StatusBar.currentHeight || 0) + 50 }}
-  >
-    {/* Top Row - Better centered */}
-    <View className="flex-row justify-between items-center mb-8 px-2">
-      <View className="flex-1 pr-4">
-        <Text className="text-white text-sm opacity-90 mb-2">
-          {doctor.greeting}
-        </Text>
-        <Text className="text-white text-2xl font-bold leading-7">
-          {doctor.name}
-        </Text>
-      </View>
+    <View style={{ flex: 1 }}>
+      <StatusBar barStyle="light-content" backgroundColor="#1a1a2e" />
       
-      <View className="flex-row items-center">
-        <TouchableOpacity 
-          className="rounded-xl p-3 mr-4"
-          style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
-        >
-          <Text className="text-xl">{Icons.bell}</Text>
-        </TouchableOpacity>
-        
-        <Image 
-          source={{ uri: doctor.profilePic }}
-          className="w-14 h-14 rounded-full border-2"
-          style={{ borderColor: 'rgba(255,255,255,0.4)' }}
-        />
-      </View>
-    </View>
-
-    {/* Stats Row - Better centered */}
-    <View 
-      className="flex-row rounded-2xl p-6 mx-1 mb-4  "
-      style={{ backgroundColor: 'rgba(255,255,255,0.18)' }}
-    >
-      <View className="flex-1 items-center">
-        <Text className="text-white text-3xl font-bold mb-1">
-          {appointments.today}
-        </Text>
-        <Text className="text-white text-xs opacity-90 text-center">
-          Today's Visits
-        </Text>
-      </View>
-      
-      <View 
-        className="w-px mx-6"
-        style={{ backgroundColor: 'rgba(255,255,255,0.35)' }}
-      />
-      
-      <View className="flex-1 items-center">
-        <Text className="text-white text-3xl font-bold mb-1">
-          {appointments.total}
-        </Text>
-        <Text className="text-white text-xs opacity-90 text-center">
-          This Week
-        </Text>
-      </View>
-    </View>
-  </LinearGradient>
-);
-
-// Quick Insights Section with purple theme
-const QuickInsights = ({ insights }) => (
-  <View className="px-5 mt-8 mb-8">
-    <Text className="text-xl font-bold text-gray-800 mb-4">
-      Quick Insights
-    </Text>
-    
-    <View className="flex-row mb-4">
-      <InsightCard
-        title="High Risk"
-        value={insights.highRiskPregnancies}
-        subtitle="Need attention"
-        icon={Icons.warning}
-        color="rose"
-      />
-      <InsightCard
-        title="C-Sections"
-        value={`${insights.csectionRate}%`}
-        subtitle="This month"
-        icon={Icons.chart}
-        color="fuchsia"
-      />
-    </View>
-    
-    {/* Upcoming Due Dates */}
-    <View 
-      className="bg-white rounded-2xl p-4 shadow-lg"
-      style={{
-        shadowColor: '#A855F7',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 4,
-      }}
-    >
-      <View className="flex-row items-center mb-3">
-        <View className="w-10 h-10 bg-pink-100 rounded-xl items-center justify-center mr-3">
-          <Text className="text-xl">{Icons.baby}</Text>
-        </View>
-        <Text className="text-base font-semibold text-gray-800">
-          Upcoming Due Dates
-        </Text>
-      </View>
-      
-      {insights.upcomingDueDates.map((patient, index) => (
-        <View 
-          key={index} 
-          className={`flex-row justify-between items-center py-2 ${
-            index < insights.upcomingDueDates.length - 1 ? 'border-b border-gray-100' : ''
-          }`}
-          style={index < insights.upcomingDueDates.length - 1 ? {
-            borderBottomWidth: 1,
-            borderBottomColor: '#F3F4F6'
-          } : {}}
-        >
-          <Text className="text-sm text-gray-700 font-medium">
-            {patient.name}
-          </Text>
-          <View className="bg-pink-100 px-2 py-1 rounded-lg">
-            <Text className="text-xs text-pink-700 font-semibold">
-              {patient.date}
-            </Text>
-          </View>
-        </View>
-      ))}
-    </View>
-  </View>
-);
-
-// Clinical Tools Grid with purple-pink theme
-const ClinicalTools = ({ onNavigate }) => (
-  <View className="pb-10">
-    <Text className="text-xl font-bold text-gray-800 mb-5 px-5">
-      Clinical Tools
-    </Text>
-    
-    <ModernCard
-      title="Predict Delivery Mode"
-      description="Use AI to predict the most likely delivery method for your patient"
-      icon={Icons.stethoscope}
-      onPress={() => onNavigate('/DoctorScreens/DelieveryModePredictionService')}
-      iconBg="bg-rose-50"
-    />
-
-    <ModernCard
-      title="Due Date Estimator"
-      description="Calculate estimated due date based on LMP or ultrasound scan"
-      icon={Icons.baby}
-      onPress={() => onNavigate('/DoctorScreens/DueDateCalculator')}
-      iconBg="bg-pink-50"
-    />
-
-    <ModernCard
-      title="BMI Calculator"
-      description="Monitor pregnancy health with BMI calculations and tracking"
-      icon={Icons.scale}
-      onPress={() => onNavigate('/DoctorScreens/BMICalculator')}
-      iconBg="bg-purple-50"
-    />
-
-    <ModernCard 
-      title="Appointment Booking"
-      description="Manage and schedule patient appointments efficiently"
-      icon={Icons.calendar}
-      onPress={() => console.log("Navigation to Appointments")}
-      iconBg="bg-fuchsia-50"
-    />
-
-    <ModernCard
-      title="Patients History"
-      description="Access comprehensive antenatal forms and patient records"
-      icon={Icons.history}
-      onPress={() => onNavigate('/DoctorScreens/AntenatalForm')}
-      iconBg="bg-violet-50"
-    />
-
-    <ModernCard
-      title="Medical Records"
-      description="Review patient medical records and communication history"
-      icon={Icons.records}
-      onPress={() => onNavigate('/DoctorScreens/Patients')}
-      iconBg="bg-purple-50"
-    />
-  </View>
-);
-
-// Main Dashboard Component
-const Dashboard = () => {
-  const handleNavigation = (route) => {
-    console.log(`Navigating to: ${route}`);
-    router.push(route);
-  };
-
-  return (
-    <View className="flex-1 bg-purple-50">
-      <StatusBar barStyle="light-content" backgroundColor="#8B5CF6" />
-      
-      <ScrollView 
-        className="flex-1"
-        showsVerticalScrollIndicator={false}
-        bounces={false}
+      <LinearGradient
+        colors={['#1a1a2e', '#16213e', '#0f3460']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{ flex: 1 }}
       >
-        <ModernHeader 
-          doctor={mockData.doctor} 
-          appointments={mockData.appointments} 
-        />
+        <ScrollView 
+          style={{ flex: 1 }}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          <ModernHeader doctor={mockData.doctor} />
+          
+          {/* Today's Appointments Widget */}
+          <View style={{ paddingHorizontal: 20 }}>
+            <TodaysAppointmentsWidget appointments={mockData.todayAppointments} />
+          </View>
+
+          {/* Main Features */}
+          <View style={{ paddingHorizontal: 20, marginBottom: 20 }}>
+            <Text style={{
+              color: 'white',
+              fontSize: 16,
+              fontWeight: 'bold',
+              marginBottom: 12,
+            }}>
+              Quick Actions
+            </Text>
+            <View style={{ 
+              flexDirection: 'row', 
+              flexWrap: 'wrap', 
+              justifyContent: 'space-between',
+              paddingBottom: 100,
+            }}>
+              <DashboardCard
+                title="Predict Delivery Mode"
+                description="AI-powered predictions"
+                icon={Icons.smile}
+                onPress={() => handleNavigation('/DoctorScreens/DelieveryModePredictionService')}
+                backgroundImage={require('../DoctorAssets/DoctorPatient.jpg')}
+                isHighlight={true}
+              />
+
+              <DashboardCard
+                title="Chat & Patients"
+                description="Monitor conversations"
+                icon={Icons.chat}
+                onPress={() => handleNavigation('/DoctorScreens/Patients')}
+                backgroundImage={require('../DoctorAssets/ai.jpg')}
+              />
+
+              <DashboardCard
+                title="Due Date Calculator"
+                description="Calculate due dates"
+                icon={Icons.baby}
+                onPress={() => handleNavigation('/DoctorScreens/DueDateCalculator')}
+                backgroundImage={require('../DoctorAssets/DueDate.webp')}
+              />
+
+              <DashboardCard
+                title="BMI Calculator"
+                description="Health monitoring"
+                icon={Icons.scale}
+                onPress={() => handleNavigation('/DoctorScreens/BMICalculator')}
+                backgroundImage={require('../DoctorAssets/bmi.jpg')}
+              />
+
+              <DashboardCard
+                title="Appointments"
+                description="Schedule & manage"
+                icon={Icons.calendar}
+                onPress={() => console.log("Navigation to Appointments")}
+                backgroundImage={require('../DoctorAssets/appointments.jpg')}
+              />
+
+              <DashboardCard
+                title="Patient History"
+                description="Antenatal records"
+                icon={Icons.history}
+                onPress={() => handleNavigation('/DoctorScreens/AntenatalForm')}
+                backgroundImage={require('../DoctorAssets/history.jpg')}
+              />
+            </View>
+          </View>
+        </ScrollView>
         
-        <QuickInsights insights={mockData.insights} />
-        
-        <ClinicalTools onNavigate={handleNavigation} />
-      </ScrollView>
+        <BottomTabBar />
+      </LinearGradient>
     </View>
   );
 };
