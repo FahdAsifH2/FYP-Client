@@ -55,7 +55,7 @@ const AppointmentBookingForm = () => {
 
       try {
         const response = await axios.post(
-          "http://192.168.31.188:5001/api/Doctors/appointments",
+          "http://192.168.31.188:5001/api/Doctors/GetTomorrowsAppointments",
           formData
         );
         console.log("Appointments Submitted");
