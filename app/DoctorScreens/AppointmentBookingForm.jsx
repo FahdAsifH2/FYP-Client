@@ -1,30 +1,69 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StatusBar, Alert, Modal, KeyboardAvoidingView, Platform } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
-
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  StatusBar,
+  Alert,
+  Modal,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import axios from "axios";
 const AppointmentBookingForm = () => {
   const [formData, setFormData] = useState({
-    patientName: '', appointmentDate: '', appointmentTime: '', appointmentType: '', issue: ''
+    patientName: "",
+    appointmentDate: "",
+    appointmentTime: "",
+    appointmentType: "",
+    issue: "",
   });
-  
+
   const [showSuccess, setShowSuccess] = useState(false);
   const [showAppointmentTypes, setShowAppointmentTypes] = useState(false);
   const [showTimeSlots, setShowTimeSlots] = useState(false);
 
-  const appointmentTypes = ['Routine Checkup', 'Consultation', 'Follow-up','New Patinets', 'Ultrasound', 'Lab Review', 'Emergency'];
+  const appointmentTypes = [
+    "Routine Checkup",
+    "Consultation",
+    "Follow-up",
+    "New Patinets",
+    "Ultrasound",
+    "Lab Review",
+    "Emergency",
+  ];
 
-  const handleInputChange = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
+  const handleInputChange = (field, value) =>
+    setFormData((prev) => ({ ...prev, [field]: value }));
 
-  const handleSubmit = () => {
-    if (formData.patientName && formData.appointmentDate && formData.appointmentTime && formData.appointmentType) {
+  const handleSubmit = async () => {
+    if (
+      formData.patientName &&
+      formData.appointmentDate &&
+      formData.appointmentTime &&
+      formData.appointmentType &&
+      formData.issue
+    ) {
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
-        setFormData({ patientName: '', appointmentDate: '', appointmentTime: '', appointmentType: '', issue: '' });
-      }, 2500);
+      }, 3500);
+
+      try {
+        const response = await axios.post(
+          "http://192.168.31.188:5001/api/Doctors/appointments",
+          formData
+        );
+        console.log("Appointments Submitted");
+      } catch (error) {
+        console.log(error);
+      }
     } else {
-      Alert.alert('Missing Information', 'Please fill all required fields');
+      Alert.alert("Missing Information", "Please fill all required fields");
     }
   };
 
@@ -34,21 +73,25 @@ const AppointmentBookingForm = () => {
     const today = new Date();
     let daysAdded = 0;
     let dayOffset = 0;
-    
+
     while (daysAdded < 6) {
       const date = new Date(today);
       date.setDate(today.getDate() + dayOffset);
       const dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
-      
+
       // Only add Monday (1) to Saturday (6)
       if (dayOfWeek >= 1 && dayOfWeek <= 6) {
         dates.push({
-          date: date.toISOString().split('T')[0],
+          date: date.toISOString().split("T")[0],
           day: date.getDate(),
-          month: date.toLocaleDateString('en-US', { month: 'short' }),
-          weekday: date.toLocaleDateString('en-US', { weekday: 'short' }),
-          fullDate: date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }),
-          isToday: dayOffset === 0
+          month: date.toLocaleDateString("en-US", { month: "short" }),
+          weekday: date.toLocaleDateString("en-US", { weekday: "short" }),
+          fullDate: date.toLocaleDateString("en-US", {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+          }),
+          isToday: dayOffset === 0,
         });
         daysAdded++;
       }
@@ -56,53 +99,38 @@ const AppointmentBookingForm = () => {
     }
     return dates;
   };
-
-  // Generate organized time slots
+  // Generate organized time slots in 24-hour format
   const generateTimeSlots = () => {
     const sessions = {
-      morning: { label: '🌅 Morning (10:00 - 12:00)', slots: [] },
-      afternoon: { label: '☀️ Afternoon (12:00 - 17:00)', slots: [] },
-      evening: { label: '🌆 Evening (17:00 - 22:00)', slots: [] }
+      morning: { label: "🌅 Morning (10:00 - 12:00)", slots: [] },
+      afternoon: { label: "☀️ Afternoon (12:00 - 5:00)", slots: [] },
+      evening: { label: "🌆 Evening (5:00 - 10:00)", slots: [] },
     };
 
-    // Morning slots (10 AM - 12 PM)
-    for (let hour = 10; hour < 12; hour++) {
+    // Morning slots (10:00 - 12:00)
+    for (let hour = 10; hour <= 12; hour++) {
+      const displayHour = hour === 12 ? 12 : hour; // Keep 12 as 12, not 0
       for (let minute = 0; minute < 60; minute += 15) {
-        const time = new Date();
-        time.setHours(hour, minute, 0, 0);
-        const timeString = time.toLocaleTimeString('en-US', { 
-          hour: 'numeric', 
-          minute: '2-digit', 
-          hour12: true 
-        });
+        const timeString = `${displayHour}:${minute.toString().padStart(2, "0")}`;
         sessions.morning.slots.push(timeString);
+        if (hour === 12 && minute === 0) break; // Stop at 12:00
       }
     }
 
-    // Afternoon slots (12 PM - 5 PM)
+    // Afternoon slots (12:00 - 5:00)
     for (let hour = 12; hour < 17; hour++) {
+      const displayHour = hour > 12 ? hour - 12 : hour; // Convert 13-16 to 1-4
       for (let minute = 0; minute < 60; minute += 15) {
-        const time = new Date();
-        time.setHours(hour, minute, 0, 0);
-        const timeString = time.toLocaleTimeString('en-US', { 
-          hour: 'numeric', 
-          minute: '2-digit', 
-          hour12: true 
-        });
+        const timeString = `${displayHour}:${minute.toString().padStart(2, "0")}`;
         sessions.afternoon.slots.push(timeString);
       }
     }
 
-    // Evening slots (5 PM - 10 PM)
+    // Evening slots (5:00 - 10:00)
     for (let hour = 17; hour < 22; hour++) {
+      const displayHour = hour - 12; // Convert 17-21 to 5-9
       for (let minute = 0; minute < 60; minute += 15) {
-        const time = new Date();
-        time.setHours(hour, minute, 0, 0);
-        const timeString = time.toLocaleTimeString('en-US', { 
-          hour: 'numeric', 
-          minute: '2-digit', 
-          hour12: true 
-        });
+        const timeString = `${displayHour}:${minute.toString().padStart(2, "0")}`;
         sessions.evening.slots.push(timeString);
       }
     }
@@ -110,78 +138,183 @@ const AppointmentBookingForm = () => {
     return sessions;
   };
 
-  const selectedDateObj = getWorkingDays().find(d => d.date === formData.appointmentDate);
+  const selectedDateObj = getWorkingDays().find(
+    (d) => d.date === formData.appointmentDate
+  );
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <StatusBar barStyle="light-content" backgroundColor="#1a1a2e" />
-      <LinearGradient colors={['#1a1a2e', '#16213e', '#0f3460']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ flex: 1 }}>
-        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-          
+      <LinearGradient
+        colors={["#1a1a2e", "#16213e", "#0f3460"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          style={{ flex: 1 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
           {/* Header */}
-          <View style={{ paddingTop: (StatusBar.currentHeight || 44) + 20, paddingHorizontal: 20, paddingBottom: 30 }}>
-            <TouchableOpacity onPress={() => router.back()}
-              style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
-              <Text style={{ color: 'white', fontSize: 18 }}>←</Text>
+          <View
+            style={{
+              paddingTop: (StatusBar.currentHeight || 44) + 20,
+              paddingHorizontal: 20,
+              paddingBottom: 30,
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 20,
+              }}
+            >
+              <Text style={{ color: "white", fontSize: 18 }}>←</Text>
             </TouchableOpacity>
-            
-            <Text style={{ color: 'white', fontSize: 28, fontWeight: 'bold', marginBottom: 8 }}>Book Appointment</Text>
-            <Text style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: 16 }}>Schedule a new patient appointment</Text>
+
+            <Text
+              style={{
+                color: "white",
+                fontSize: 28,
+                fontWeight: "bold",
+                marginBottom: 8,
+              }}
+            >
+              Book Appointment
+            </Text>
+            <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 16 }}>
+              Schedule a new patient appointment
+            </Text>
           </View>
 
           <View style={{ paddingHorizontal: 20 }}>
-            
             {/* Patient Name */}
             <View style={{ marginBottom: 25 }}>
-              <Text style={{ color: 'white', fontSize: 18, fontWeight: '600', marginBottom: 12 }}>Patient Name</Text>
-              <TextInput 
-                value={formData.patientName} 
-                onChangeText={(text) => handleInputChange('patientName', text)}
-                style={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)', 
-                  borderWidth: 2, 
-                  borderColor: formData.patientName ? '#8b5cf6' : 'rgba(255, 255, 255, 0.2)', 
-                  borderRadius: 16, 
-                  padding: 18, 
-                  color: 'white', 
-                  fontSize: 16 
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 18,
+                  fontWeight: "600",
+                  marginBottom: 12,
                 }}
-                placeholder="Enter patient name" 
-                placeholderTextColor="rgba(255, 255, 255, 0.5)" 
+              >
+                Patient Name
+              </Text>
+              <TextInput
+                value={formData.patientName}
+                onChangeText={(text) => handleInputChange("patientName", text)}
+                style={{
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  borderWidth: 2,
+                  borderColor: formData.patientName
+                    ? "#8b5cf6"
+                    : "rgba(255, 255, 255, 0.2)",
+                  borderRadius: 16,
+                  padding: 18,
+                  color: "white",
+                  fontSize: 16,
+                }}
+                placeholder="Enter patient name"
+                placeholderTextColor="rgba(255, 255, 255, 0.5)"
               />
             </View>
 
             {/* Date Selection */}
             <View style={{ marginBottom: 25 }}>
-              <Text style={{ color: 'white', fontSize: 18, fontWeight: '600', marginBottom: 12 }}>Select Date</Text>
-              <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 14, marginBottom: 15 }}>Available Monday - Saturday</Text>
-              
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 20 }}>
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 18,
+                  fontWeight: "600",
+                  marginBottom: 12,
+                }}
+              >
+                Select Date
+              </Text>
+              <Text
+                style={{
+                  color: "rgba(255, 255, 255, 0.6)",
+                  fontSize: 14,
+                  marginBottom: 15,
+                }}
+              >
+                Available Monday - Saturday
+              </Text>
+
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingRight: 20 }}
+              >
                 {getWorkingDays().map((dateObj, index) => (
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     key={index}
-                    onPress={() => handleInputChange('appointmentDate', dateObj.date)}
+                    onPress={() =>
+                      handleInputChange("appointmentDate", dateObj.date)
+                    }
                     style={{
-                      backgroundColor: formData.appointmentDate === dateObj.date ? '#8b5cf6' : 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: 16, 
-                      padding: 16, 
-                      alignItems: 'center', 
+                      backgroundColor:
+                        formData.appointmentDate === dateObj.date
+                          ? "#8b5cf6"
+                          : "rgba(255, 255, 255, 0.1)",
+                      borderRadius: 16,
+                      padding: 16,
+                      alignItems: "center",
                       minWidth: 80,
                       marginRight: 12,
-                      borderWidth: 2, 
-                      borderColor: formData.appointmentDate === dateObj.date ? '#8b5cf6' : 'rgba(255, 255, 255, 0.2)'
-                    }}>
-                    <Text style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: 12, marginBottom: 4 }}>
+                      borderWidth: 2,
+                      borderColor:
+                        formData.appointmentDate === dateObj.date
+                          ? "#8b5cf6"
+                          : "rgba(255, 255, 255, 0.2)",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "rgba(255, 255, 255, 0.7)",
+                        fontSize: 12,
+                        marginBottom: 4,
+                      }}
+                    >
                       {dateObj.weekday}
                     </Text>
-                    <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 2 }}>
+                    <Text
+                      style={{
+                        color: "white",
+                        fontSize: 20,
+                        fontWeight: "bold",
+                        marginBottom: 2,
+                      }}
+                    >
                       {dateObj.day}
                     </Text>
-                    <Text style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: 11 }}>
+                    <Text
+                      style={{
+                        color: "rgba(255, 255, 255, 0.7)",
+                        fontSize: 11,
+                      }}
+                    >
                       {dateObj.month}
                     </Text>
                     {dateObj.isToday && (
-                      <Text style={{ color: '#22c55e', fontSize: 10, fontWeight: 'bold', marginTop: 2 }}>
+                      <Text
+                        style={{
+                          color: "#22c55e",
+                          fontSize: 10,
+                          fontWeight: "bold",
+                          marginTop: 2,
+                        }}
+                      >
                         Today
                       </Text>
                     )}
@@ -192,175 +325,281 @@ const AppointmentBookingForm = () => {
 
             {/* Time Selection */}
             <View style={{ marginBottom: 25 }}>
-              <Text style={{ color: 'white', fontSize: 18, fontWeight: '600', marginBottom: 12 }}>Select Time</Text>
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 18,
+                  fontWeight: "600",
+                  marginBottom: 12,
+                }}
+              >
+                Select Time
+              </Text>
               {selectedDateObj && (
-                <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 14, marginBottom: 15 }}>
+                <Text
+                  style={{
+                    color: "rgba(255, 255, 255, 0.6)",
+                    fontSize: 14,
+                    marginBottom: 15,
+                  }}
+                >
                   {selectedDateObj.fullDate}
                 </Text>
               )}
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
                 onPress={() => setShowTimeSlots(true)}
-                style={{ 
-                  backgroundColor: formData.appointmentTime ? 'rgba(139, 92, 246, 0.2)' : 'rgba(255, 255, 255, 0.1)', 
-                  borderWidth: 2, 
-                  borderColor: formData.appointmentTime ? '#8b5cf6' : 'rgba(255, 255, 255, 0.2)', 
-                  borderRadius: 16, 
-                  padding: 20, 
-                  flexDirection: 'row', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center' 
-                }}>
+                style={{
+                  backgroundColor: formData.appointmentTime
+                    ? "rgba(139, 92, 246, 0.2)"
+                    : "rgba(255, 255, 255, 0.1)",
+                  borderWidth: 2,
+                  borderColor: formData.appointmentTime
+                    ? "#8b5cf6"
+                    : "rgba(255, 255, 255, 0.2)",
+                  borderRadius: 16,
+                  padding: 20,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
                 <View>
-                  <Text style={{ color: 'white', fontSize: 16, fontWeight: '500' }}>
-                    {formData.appointmentTime || 'Choose time slot'}
+                  <Text
+                    style={{ color: "white", fontSize: 16, fontWeight: "500" }}
+                  >
+                    {formData.appointmentTime || "Choose time slot"}
                   </Text>
                   {!formData.appointmentTime && (
-                    <Text style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: 13, marginTop: 2 }}>
+                    <Text
+                      style={{
+                        color: "rgba(255, 255, 255, 0.5)",
+                        fontSize: 13,
+                        marginTop: 2,
+                      }}
+                    >
                       15-minute slots available
                     </Text>
                   )}
                 </View>
-                <Text style={{ color: '#8b5cf6', fontSize: 18 }}>⏰</Text>
+                <Text style={{ color: "#8b5cf6", fontSize: 18 }}>⏰</Text>
               </TouchableOpacity>
             </View>
 
             {/* Appointment Type */}
             <View style={{ marginBottom: 25 }}>
-              <Text style={{ color: 'white', fontSize: 18, fontWeight: '600', marginBottom: 12 }}>Appointment Type</Text>
-              <TouchableOpacity 
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 18,
+                  fontWeight: "600",
+                  marginBottom: 12,
+                }}
+              >
+                Appointment Type
+              </Text>
+              <TouchableOpacity
                 onPress={() => setShowAppointmentTypes(true)}
-                style={{ 
-                  backgroundColor: formData.appointmentType ? 'rgba(139, 92, 246, 0.2)' : 'rgba(255, 255, 255, 0.1)', 
-                  borderWidth: 2, 
-                  borderColor: formData.appointmentType ? '#8b5cf6' : 'rgba(255, 255, 255, 0.2)', 
-                  borderRadius: 16, 
-                  padding: 20, 
-                  flexDirection: 'row', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center' 
-                }}>
-                <Text style={{ color: formData.appointmentType ? 'white' : 'rgba(255, 255, 255, 0.5)', fontSize: 16 }}>
-                  {formData.appointmentType || 'Select appointment type'}
+                style={{
+                  backgroundColor: formData.appointmentType
+                    ? "rgba(139, 92, 246, 0.2)"
+                    : "rgba(255, 255, 255, 0.1)",
+                  borderWidth: 2,
+                  borderColor: formData.appointmentType
+                    ? "#8b5cf6"
+                    : "rgba(255, 255, 255, 0.2)",
+                  borderRadius: 16,
+                  padding: 20,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    color: formData.appointmentType
+                      ? "white"
+                      : "rgba(255, 255, 255, 0.5)",
+                    fontSize: 16,
+                  }}
+                >
+                  {formData.appointmentType || "Select appointment type"}
                 </Text>
-                <Text style={{ color: '#8b5cf6', fontSize: 18 }}>📋</Text>
+                <Text style={{ color: "#8b5cf6", fontSize: 18 }}>📋</Text>
               </TouchableOpacity>
             </View>
 
             {/* Issue/Notes */}
             <View style={{ marginBottom: 30 }}>
-              <Text style={{ color: 'white', fontSize: 18, fontWeight: '600', marginBottom: 12 }}>
-                Additional Notes 
-                <Text style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: 14, fontWeight: '400' }}> (optional)</Text>
-              </Text>
-              <TextInput 
-                value={formData.issue} 
-                onChangeText={(text) => handleInputChange('issue', text)} 
-                multiline 
-                numberOfLines={4}
-                style={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)', 
-                  borderWidth: 2, 
-                  borderColor: formData.issue ? '#8b5cf6' : 'rgba(255, 255, 255, 0.2)', 
-                  borderRadius: 16, 
-                  padding: 18, 
-                  color: 'white', 
-                  fontSize: 16, 
-                  textAlignVertical: 'top',
-                  minHeight: 100
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 18,
+                  fontWeight: "600",
+                  marginBottom: 12,
                 }}
-                placeholder="Brief description of the issue or reason for visit" 
-                placeholderTextColor="rgba(255, 255, 255, 0.5)" 
+              >
+                Additional Notes
+                <Text
+                  style={{
+                    color: "rgba(255, 255, 255, 0.5)",
+                    fontSize: 14,
+                    fontWeight: "400",
+                  }}
+                >
+                  {" "}
+                  (optional)
+                </Text>
+              </Text>
+              <TextInput
+                value={formData.issue}
+                onChangeText={(text) => handleInputChange("issue", text)}
+                multiline
+                numberOfLines={4}
+                style={{
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  borderWidth: 2,
+                  borderColor: formData.issue
+                    ? "#8b5cf6"
+                    : "rgba(255, 255, 255, 0.2)",
+                  borderRadius: 16,
+                  padding: 18,
+                  color: "white",
+                  fontSize: 16,
+                  textAlignVertical: "top",
+                  minHeight: 100,
+                }}
+                placeholder="Brief description of the issue or reason for visit"
+                placeholderTextColor="rgba(255, 255, 255, 0.5)"
               />
             </View>
-            
+
             {/* Submit Button */}
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={handleSubmit}
-              style={{ 
-                backgroundColor: '#8b5cf6', 
-                borderRadius: 16, 
-                padding: 20, 
-                alignItems: 'center', 
-                shadowColor: '#8b5cf6', 
-                shadowOffset: { width: 0, height: 4 }, 
-                shadowOpacity: 0.3, 
-                shadowRadius: 8, 
+              style={{
+                backgroundColor: "#8b5cf6",
+                borderRadius: 16,
+                padding: 20,
+                alignItems: "center",
+                shadowColor: "#8b5cf6",
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
                 elevation: 8,
-                marginBottom: 40
-              }}>
-              <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>Book Appointment</Text>
+                marginBottom: 40,
+              }}
+            >
+              <Text
+                style={{ color: "white", fontSize: 18, fontWeight: "bold" }}
+              >
+                Book Appointment
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
 
         {/* Time Slots Modal */}
         <Modal visible={showTimeSlots} transparent animationType="slide">
-          <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
-            <View style={{ 
-              flex: 1, 
-              backgroundColor: '#1a1a2e', 
-              marginTop: 60,
-              borderTopLeftRadius: 24, 
-              borderTopRightRadius: 24 
-            }}>
-              
+          <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.7)" }}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "#1a1a2e",
+                marginTop: 60,
+                borderTopLeftRadius: 24,
+                borderTopRightRadius: 24,
+              }}
+            >
               {/* Modal Header */}
-              <View style={{ 
-                flexDirection: 'row', 
-                justifyContent: 'space-between', 
-                alignItems: 'center', 
-                padding: 20, 
-                borderBottomWidth: 1, 
-                borderBottomColor: 'rgba(255, 255, 255, 0.1)' 
-              }}>
-                <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>Choose Time Slot</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: 20,
+                  borderBottomWidth: 1,
+                  borderBottomColor: "rgba(255, 255, 255, 0.1)",
+                }}
+              >
+                <Text
+                  style={{ color: "white", fontSize: 20, fontWeight: "bold" }}
+                >
+                  Choose Time Slot
+                </Text>
                 <TouchableOpacity onPress={() => setShowTimeSlots(false)}>
-                  <Text style={{ color: '#8b5cf6', fontSize: 16, fontWeight: '600' }}>Cancel</Text>
+                  <Text
+                    style={{
+                      color: "#8b5cf6",
+                      fontSize: 16,
+                      fontWeight: "600",
+                    }}
+                  >
+                    Cancel
+                  </Text>
                 </TouchableOpacity>
               </View>
 
-              <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+              <ScrollView
+                style={{ flex: 1 }}
+                showsVerticalScrollIndicator={false}
+              >
                 <View style={{ padding: 20 }}>
                   {Object.entries(generateTimeSlots()).map(([key, session]) => (
                     <View key={key} style={{ marginBottom: 25 }}>
-                      <Text style={{ 
-                        color: 'white', 
-                        fontSize: 16, 
-                        fontWeight: '600', 
-                        marginBottom: 15,
-                        paddingLeft: 4
-                      }}>
+                      <Text
+                        style={{
+                          color: "white",
+                          fontSize: 16,
+                          fontWeight: "600",
+                          marginBottom: 15,
+                          paddingLeft: 4,
+                        }}
+                      >
                         {session.label}
                       </Text>
-                      
-                      <View style={{ 
-                        flexDirection: 'row', 
-                        flexWrap: 'wrap', 
-                        justifyContent: 'space-between' 
-                      }}>
+
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          flexWrap: "wrap",
+                          justifyContent: "space-between",
+                        }}
+                      >
                         {session.slots.map((slot, index) => (
-                          <TouchableOpacity 
+                          <TouchableOpacity
                             key={index}
                             onPress={() => {
-                              handleInputChange('appointmentTime', slot);
+                              handleInputChange("appointmentTime", slot);
                               setShowTimeSlots(false);
                             }}
                             style={{
-                              backgroundColor: formData.appointmentTime === slot ? '#8b5cf6' : 'rgba(255, 255, 255, 0.1)',
-                              borderRadius: 12, 
-                              padding: 14, 
-                              alignItems: 'center', 
-                              width: '31%', 
+                              backgroundColor:
+                                formData.appointmentTime === slot
+                                  ? "#8b5cf6"
+                                  : "rgba(255, 255, 255, 0.1)",
+                              borderRadius: 12,
+                              padding: 14,
+                              alignItems: "center",
+                              width: "31%",
                               marginBottom: 12,
-                              borderWidth: 1, 
-                              borderColor: formData.appointmentTime === slot ? '#8b5cf6' : 'rgba(255, 255, 255, 0.2)'
-                            }}>
-                            <Text style={{ 
-                              color: 'white', 
-                              fontSize: 13, 
-                              fontWeight: formData.appointmentTime === slot ? '600' : '400'
-                            }}>
+                              borderWidth: 1,
+                              borderColor:
+                                formData.appointmentTime === slot
+                                  ? "#8b5cf6"
+                                  : "rgba(255, 255, 255, 0.2)",
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color: "white",
+                                fontSize: 13,
+                                fontWeight:
+                                  formData.appointmentTime === slot
+                                    ? "600"
+                                    : "400",
+                              }}
+                            >
                               {slot}
                             </Text>
                           </TouchableOpacity>
@@ -377,42 +616,59 @@ const AppointmentBookingForm = () => {
 
         {/* Appointment Type Modal */}
         <Modal visible={showAppointmentTypes} transparent animationType="slide">
-          <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'flex-end' }}>
-            <View style={{ 
-              backgroundColor: '#1a1a2e', 
-              borderTopLeftRadius: 24, 
-              borderTopRightRadius: 24, 
-              paddingTop: 20, 
-              maxHeight: '60%' 
-            }}>
-              <View style={{ 
-                flexDirection: 'row', 
-                justifyContent: 'space-between', 
-                alignItems: 'center', 
-                paddingHorizontal: 20, 
-                paddingBottom: 15, 
-                borderBottomWidth: 1, 
-                borderBottomColor: 'rgba(255, 255, 255, 0.1)' 
-              }}>
-                <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>Appointment Type</Text>
-                <TouchableOpacity onPress={() => setShowAppointmentTypes(false)}>
-                  <Text style={{ color: '#8b5cf6', fontSize: 16 }}>Cancel</Text>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              justifyContent: "flex-end",
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "#1a1a2e",
+                borderTopLeftRadius: 24,
+                borderTopRightRadius: 24,
+                paddingTop: 20,
+                maxHeight: "60%",
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingHorizontal: 20,
+                  paddingBottom: 15,
+                  borderBottomWidth: 1,
+                  borderBottomColor: "rgba(255, 255, 255, 0.1)",
+                }}
+              >
+                <Text
+                  style={{ color: "white", fontSize: 18, fontWeight: "bold" }}
+                >
+                  Appointment Type
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setShowAppointmentTypes(false)}
+                >
+                  <Text style={{ color: "#8b5cf6", fontSize: 16 }}>Cancel</Text>
                 </TouchableOpacity>
               </View>
               <ScrollView style={{ maxHeight: 300 }}>
                 {appointmentTypes.map((type, index) => (
-                  <TouchableOpacity 
-                    key={index} 
-                    onPress={() => { 
-                      handleInputChange('appointmentType', type); 
-                      setShowAppointmentTypes(false); 
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => {
+                      handleInputChange("appointmentType", type);
+                      setShowAppointmentTypes(false);
                     }}
-                    style={{ 
-                      padding: 20, 
-                      borderBottomWidth: 1, 
-                      borderBottomColor: 'rgba(255, 255, 255, 0.05)' 
-                    }}>
-                    <Text style={{ color: 'white', fontSize: 16 }}>{type}</Text>
+                    style={{
+                      padding: 20,
+                      borderBottomWidth: 1,
+                      borderBottomColor: "rgba(255, 255, 255, 0.05)",
+                    }}
+                  >
+                    <Text style={{ color: "white", fontSize: 16 }}>{type}</Text>
                   </TouchableOpacity>
                 ))}
               </ScrollView>
@@ -422,59 +678,74 @@ const AppointmentBookingForm = () => {
 
         {/* Success Modal */}
         <Modal visible={showSuccess} transparent animationType="fade">
-          <View style={{ 
-            flex: 1, 
-            backgroundColor: 'rgba(0, 0, 0, 0.5)', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            padding: 24 
-          }}>
-            <View style={{ 
-              backgroundColor: '#1a1a2e', 
-              borderRadius: 24, 
-              padding: 32, 
-              borderWidth: 1, 
-              borderColor: 'rgba(255, 255, 255, 0.2)', 
-              alignItems: 'center', 
-              minWidth: 300 
-            }}>
-              <View style={{ 
-                width: 80, 
-                height: 80, 
-                borderRadius: 40, 
-                backgroundColor: 'rgba(34, 197, 94, 0.2)', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                marginBottom: 20 
-              }}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: 24,
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "#1a1a2e",
+                borderRadius: 24,
+                padding: 32,
+                borderWidth: 1,
+                borderColor: "rgba(255, 255, 255, 0.2)",
+                alignItems: "center",
+                minWidth: 300,
+              }}
+            >
+              <View
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: 40,
+                  backgroundColor: "rgba(34, 197, 94, 0.2)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: 20,
+                }}
+              >
                 <Text style={{ fontSize: 32 }}>✅</Text>
               </View>
-              <Text style={{ 
-                color: 'white', 
-                fontSize: 22, 
-                fontWeight: 'bold', 
-                marginBottom: 8, 
-                textAlign: 'center' 
-              }}>
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 22,
+                  fontWeight: "bold",
+                  marginBottom: 8,
+                  textAlign: "center",
+                }}
+              >
                 Appointment Booked!
               </Text>
-              <Text style={{ 
-                color: 'rgba(255, 255, 255, 0.7)', 
-                fontSize: 14, 
-                textAlign: 'center', 
-                marginBottom: 20 
-              }}>
-                {formData.patientName}'s appointment scheduled for {selectedDateObj?.fullDate} at {formData.appointmentTime}
+              <Text
+                style={{
+                  color: "rgba(255, 255, 255, 0.7)",
+                  fontSize: 14,
+                  textAlign: "center",
+                  marginBottom: 20,
+                }}
+              >
+                {formData.patientName}'s appointment scheduled for{" "}
+                {selectedDateObj?.fullDate} at {formData.appointmentTime}
               </Text>
-              <View style={{ 
-                backgroundColor: 'rgba(34, 197, 94, 0.1)', 
-                borderWidth: 1, 
-                borderColor: 'rgba(34, 197, 94, 0.2)', 
-                borderRadius: 12, 
-                padding: 12, 
-                alignItems: 'center' 
-              }}>
-                <Text style={{ color: '#22c55e', fontSize: 12, fontWeight: '600' }}>
+              <View
+                style={{
+                  backgroundColor: "rgba(34, 197, 94, 0.1)",
+                  borderWidth: 1,
+                  borderColor: "rgba(34, 197, 94, 0.2)",
+                  borderRadius: 12,
+                  padding: 12,
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{ color: "#22c55e", fontSize: 12, fontWeight: "600" }}
+                >
                   Confirmation sent to patient
                 </Text>
               </View>
