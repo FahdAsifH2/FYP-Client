@@ -7,6 +7,7 @@ const AppointmentBookingForm = () => {
   const [formData, setFormData] = useState({
     patientName: '', appointmentDate: '', appointmentTime: '', appointmentType: '', issue: ''
   });
+  
   const [showSuccess, setShowSuccess] = useState(false);
   const [showAppointmentTypes, setShowAppointmentTypes] = useState(false);
   const [showTimeSlots, setShowTimeSlots] = useState(false);
