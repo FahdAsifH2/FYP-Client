@@ -1,7 +1,7 @@
 import React from 'react';
 import { SvgXml } from 'react-native-svg';
 import { Asset } from 'expo-asset';
-import { readAsStringAsync } from 'expo-file-system';
+import { readAsStringAsync } from 'expo-file-system/legacy';
 
 const DoctorSvg = ({ width = 160, height = 160 }) => {
   const [svgContent, setSvgContent] = React.useState(null);

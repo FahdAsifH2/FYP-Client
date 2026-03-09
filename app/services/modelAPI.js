@@ -54,3 +54,5 @@ export const transformPatientDataForModel = (patientData) => {
     previous_cs: patientData.previous_c_section ? 1.0 : 0.0
   };
 };
+
+export default ModelAPI;

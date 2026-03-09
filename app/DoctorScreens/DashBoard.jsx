@@ -3,22 +3,29 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import Cards from '../components/cards';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../contexts/AuthContext';
 
 const Dashboard = () => {
+  const { logout } = useAuth();
   return (
     <View className="flex-1 bg-gray-50">
       {/* Header */}
-      <View className="pt-16 pb-6 px-6 bg-white">
+      <View className="pt-16 pb-6 px-6 bg-white shadow-sm shadow-black/5 z-10">
         <View className="flex-row items-center justify-between">
-          <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={24} color="#374151" />
+          <TouchableOpacity onPress={() => router.replace('/')}>
+            <Ionicons name="home-outline" size={24} color="#374151" />
           </TouchableOpacity>
           <View className="flex-1 items-center">
-            <Text className="text-2xl font-bold text-gynai-gray-800">
-              Doctor Panel Dashboard
+            <Text className="text-2xl font-bold text-gynai-gray-800 tracking-tight">
+              Doctor Panel
             </Text>
           </View>
-          <View className="w-6" />
+          <TouchableOpacity onPress={async () => {
+            await logout();
+            router.replace('/');
+          }}>
+            <Ionicons name="log-out-outline" size={24} color="#EF4444" />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -35,37 +42,37 @@ const Dashboard = () => {
       {/* Main Content */}
       <ScrollView className="flex-1 px-6 py-4" showsVerticalScrollIndicator={false}>
         <View className="space-y-4">
-          <Cards 
+          <Cards
             Title="Predict Delivery Mode"
             Description="Use AI-powered analysis to predict the most likely delivery method for your patient based on medical history and current data."
             onPress={() => router.push('/DoctorScreens/PredictDelivery')}
             icon="analytics"
             iconColor="primary-500"
           />
-          
+
           <View className="h-4" />
-          
-          <Cards 
+
+          <Cards
             Title="Appointment Schedule"
             Description="View and manage your upcoming appointments. Check patient schedules and availability slots."
             onPress={() => console.log("Navigation to the Appointments")}
             icon="calendar"
             iconColor="blue-500"
           />
-          
+
           <View className="h-4" />
-          
-          <Cards 
+
+          <Cards
             Title="Patient Medical History"
             Description="Access comprehensive medical histories and communicate directly with your patients through secure messaging."
             onPress={() => router.push('/DoctorScreens/AntenatalForm')}
             icon="document-text"
             iconColor="green-500"
           />
-          
+
           <View className="h-4" />
-          
-          <Cards 
+
+          <Cards
             Title="Patient Medical Records"
             Description="Browse through detailed medical records of your patients. Review test results, diagnoses, and treatment plans."
             onPress={() => router.push('/DoctorScreens/Patients')}

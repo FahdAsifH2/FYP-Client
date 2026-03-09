@@ -3,6 +3,7 @@ import React from "react";
 import { useRouter } from "expo-router";
 import { Ionicons } from '@expo/vector-icons';
 import { useHealth } from '../contexts/HealthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { patientsDashboardStyles, getCardWidth } from '../styles/PatientsDashBoard.styles';
 
 const { width } = Dimensions.get('window');
@@ -16,7 +17,8 @@ const styles = patientsDashboardStyles;
 const PatientsDashBoard = () => {
   const router = useRouter();
   const { getWaterProgress, getSleepDisplay, loadHealthData, waterCount, sleepHours } = useHealth();
-  
+  const { logout } = useAuth();
+
   // TODO: Replace with actual user data from context/API
   const [pregnancyData, setPregnancyData] = React.useState({
     currentWeek: null,
@@ -26,7 +28,7 @@ const PatientsDashBoard = () => {
     isPregnant: false
   });
 
- 
+
   React.useEffect(() => {
     loadHealthData();
     loadPregnancyData();
@@ -39,7 +41,7 @@ const PatientsDashBoard = () => {
       // TODO: Replace with actual API call to get user's pregnancy data
       // const response = await getUserPregnancyData();
       // setPregnancyData(response.data);
-      
+
       // For now, using demo data - this should be replaced with real user data
       setPregnancyData({
         currentWeek: 28, // This should come from user's actual data
@@ -50,7 +52,7 @@ const PatientsDashBoard = () => {
       });
     } catch (error) {
       console.error('Error loading pregnancy data:', error);
-      
+
       setPregnancyData({
         currentWeek: null,
         dueDate: null,
@@ -156,19 +158,27 @@ const PatientsDashBoard = () => {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={24} color="#374151" />
+          <TouchableOpacity onPress={() => router.replace('/')}>
+            <Ionicons name="home-outline" size={24} color="#374151" />
           </TouchableOpacity>
-          <TouchableOpacity>
-            <Ionicons name="notifications-outline" size={24} color="#374151" />
-          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', gap: 16 }}>
+            <TouchableOpacity>
+              <Ionicons name="notifications-outline" size={24} color="#374151" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={async () => {
+              await logout();
+              router.replace('/');
+            }}>
+              <Ionicons name="log-out-outline" size={24} color="#EF4444" />
+            </TouchableOpacity>
+          </View>
         </View>
         <Text style={styles.headerTitle}>
           {isPregnant ? 'Welcome Back!' : 'Welcome to GynAI!'}
         </Text>
         <Text style={styles.headerSubtitle}>
-          {isPregnant 
-            ? 'Your pregnancy journey, day by day' 
+          {isPregnant
+            ? 'Your pregnancy journey, day by day'
             : 'Your health and wellness companion'
           }
         </Text>
@@ -289,7 +299,7 @@ const PatientsDashBoard = () => {
                 description="Monitor weight gain"
                 icon="analytics-outline"
                 colors={["#3B82F6"]}
-                onPress={() => console.log("BMI Calculator")}
+                onPress={() => router.push("/PatientScreens/BMITracker")}
                 size="small"
               />
               <FeatureCard
@@ -297,7 +307,7 @@ const PatientsDashBoard = () => {
                 description="Schedule visits"
                 icon="calendar"
                 colors={["#10B981"]}
-                onPress={() => console.log("Appointments")}
+                onPress={() => router.push("/PatientScreens/Appointments")}
                 size="small"
               />
             </View>
@@ -315,7 +325,7 @@ const PatientsDashBoard = () => {
                 description="Quick help"
                 icon="call"
                 colors={["#EF4444"]}
-                onPress={() => console.log("Emergency")}
+                onPress={() => router.push("/PatientScreens/Emergency")}
                 size="small"
               />
             </View>
@@ -360,14 +370,14 @@ const PatientsDashBoard = () => {
               subtitle="Track prenatal vitamins"
               icon="medical-outline"
               color="#EC4899"
-              onPress={() => console.log("Medications")}
+              onPress={() => router.push("/PatientScreens/Medications")}
             />
             <QuickActionCard
               title="Symptom Tracker"
               subtitle="Log how you're feeling"
               icon="heart-outline"
               color="#F59E0B"
-              onPress={() => console.log("Symptoms")}
+              onPress={() => router.push("/PatientScreens/SymptomTracker")}
             />
           </View>
         </View>
