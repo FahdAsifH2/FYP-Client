@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import config from "../_config/config";
 
 const DeliveryModePredictionForm = () => {
   const [form, setForm] = useState({
@@ -353,7 +354,7 @@ const DeliveryModePredictionForm = () => {
 
       // Replace with your actual API endpoint
       const response = await fetch(
-        "http://192.168.31.188:5001/api/Doctors/PredictPregnancy",
+        `${config.API_URL}/api/Doctors/PredictPregnancy`,
         {
           method: "POST",
           headers: {

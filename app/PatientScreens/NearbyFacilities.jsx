@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { LocationService } from '../services/locationService';
+import { LocationService } from '../_services/locationService';
 
 const PHONE_NUMBER_CLEAN_REGEX = /[^+\d]/g;
 
@@ -198,7 +198,7 @@ const NearbyFacilities = () => {
       <Ionicons 
         name={icon} 
         size={20} 
-        color={activeTab === id ? '#8B5CF6' : '#6B7280'} 
+        color={activeTab === id ? '#ec4899' : '#6B7280'} 
       />
       <Text style={[styles.tabText, activeTab === id && styles.activeTabText]}>
         {title}
@@ -256,7 +256,7 @@ const NearbyFacilities = () => {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#8B5CF6" />
+            <ActivityIndicator size="large" color="#ec4899" />
             <Text style={styles.loadingText}>Finding nearby facilities...</Text>
           </View>
         ) : currentData.length > 0 ? (
@@ -358,12 +358,12 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   activeTabText: {
-    color: '#8B5CF6',
+    color: '#ec4899',
     fontWeight: '600',
   },
   countBadge: {
     marginLeft: 8,
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#ec4899',
     borderRadius: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   retryButton: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#ec4899',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,

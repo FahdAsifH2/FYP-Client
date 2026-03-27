@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import DoctorSvg from './components/DoctorSvg';
-import ExpectingMotherSvg from './components/ExpectingMotherSvg';
-import { useAuth } from './contexts/AuthContext';
+import DoctorSvg from './_components/DoctorSvg';
+import ExpectingMotherSvg from './_components/ExpectingMotherSvg';
+import { useAuth } from './_contexts/AuthContext';
 
 const Index = () => {
   const { user, loading } = useAuth();

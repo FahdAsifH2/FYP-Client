@@ -1,10 +1,11 @@
 import { FlatList, Text, View, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Navbar from "../components/Navbar";
-import Background from "../components/Background";
+import config from "../_config/config";
+import Navbar from "../_components/Navbar";
+import Background from "../_components/Background";
 import { useRouter } from "expo-router";
-import Footer from "../components/Footer";
+import Footer from "../_components/Footer";
 
 const Patients = () => {
   const router = useRouter();
@@ -13,7 +14,7 @@ const Patients = () => {
 
   useEffect(() => {
     axios
-      .get("http://192.168.31.188:5001/api/Doctors/getPatientsNames")
+      .get(`${config.API_URL}/api/Doctors/getPatientsNames`)
       .then((res) => {
         console.log("Promise worked for Fetching patinets");
         setPatients(res.data.data);

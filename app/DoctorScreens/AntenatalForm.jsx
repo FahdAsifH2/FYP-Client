@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import config from '../_config/config';
 
 import {
   View,
@@ -11,18 +13,6 @@ import {
   Platform,
   Alert,
 } from "react-native";
-
-const getApiUrl = () => {
-  if (typeof window !== "undefined" && window.location) {
-    return "http://localhost:5001/api/Doctors";
-  }
-  if (Platform.OS === "ios" || Platform.OS === "android") {
-    return "http://172.20.10.2:5001/api/Doctors";
-  }
-  return "http://172.20.10.2:5001/api/Doctors";
-};
-
-const API_BASE_URL = getApiUrl();
 
 const anenatalAPI = {
   async saveAntenatalCard(
@@ -142,7 +132,7 @@ const anenatalAPI = {
       };
 
       const response = await fetch(
-        `http://172.20.10.2:5001/api/Doctors/SubmitAntenatalform`,
+        `${config.API_URL}/api/Doctors/SubmitAntenatalform`,
         {
           method: "POST",
           headers: {
@@ -183,13 +173,27 @@ const TextInputField = ({
   style = {},
   testID = "",
 }) => (
-  <View style={style} className="mb-3">
-    <Text className="text-white text-sm mb-1 font-medium">
+  <View style={[{ marginBottom: 12 }, style]}>
+    <Text style={{ fontSize: 12, fontWeight: '700', color: '#374151', marginBottom: 6 }}>
       {label}
-      {required && <Text className="text-red-400"> *</Text>}
+      {required && <Text style={{ color: '#EF4444' }}> *</Text>}
     </Text>
     <TextInput
-      className="rounded-xl border border-neutral-700 bg-neutral-800 text-white px-3 h-11"
+      style={[
+        {
+          backgroundColor: '#F9FAFB',
+          borderWidth: 1.5,
+          borderColor: '#E5E7EB',
+          borderRadius: 12,
+          paddingHorizontal: 12,
+          height: 44,
+          fontSize: 14,
+          color: '#111827',
+        },
+        multiline
+          ? { height: 80, textAlignVertical: "top", paddingTop: 12 }
+          : {},
+      ]}
       placeholder={placeholder}
       placeholderTextColor="#9CA3AF"
       value={value}
@@ -198,11 +202,6 @@ const TextInputField = ({
       keyboardType={keyboardType}
       testID={testID}
       accessibilityLabel={label}
-      style={
-        multiline
-          ? { height: 80, textAlignVertical: "top", paddingTop: 12 }
-          : {}
-      }
     />
   </View>
 );
@@ -210,72 +209,117 @@ const TextInputField = ({
 const Checkbox = ({ checked, onToggle, label, testID = "" }) => (
   <TouchableOpacity
     onPress={onToggle}
-    className="flex-row items-center mb-2"
-    style={{ minHeight: 44 }}
+    style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8, minHeight: 44 }}
     testID={testID}
     accessibilityLabel={label}
     accessibilityRole="checkbox"
     accessibilityState={{ checked }}
   >
     <View
-      className={`w-5 h-5 border-2 rounded mr-3 ${checked ? "bg-emerald-600 border-emerald-600" : "border-neutral-700"} items-center justify-center`}
+      style={{
+        width: 20,
+        height: 20,
+        borderWidth: 2,
+        borderRadius: 4,
+        marginRight: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: checked ? '#8B5CF6' : 'transparent',
+        borderColor: checked ? '#8B5CF6' : '#E5E7EB',
+      }}
     >
       {checked && <Check size={12} color="white" />}
     </View>
-    <Text className="text-white text-sm flex-1">{label}</Text>
+    <Text style={{ fontSize: 14, color: '#374151', flex: 1 }}>{label}</Text>
   </TouchableOpacity>
 );
 
 const RadioGroup = ({ options, selected, onSelect, label, testID = "" }) => (
-  <View className="mb-4">
-    <Text className="text-white text-sm mb-2 font-medium">{label}</Text>
-    <View className="flex-row flex-wrap">
+  <View style={{ marginBottom: 16 }}>
+    <Text style={{ fontSize: 12, fontWeight: '700', color: '#374151', marginBottom: 8 }}>{label}</Text>
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
       {options.map((option) => (
         <TouchableOpacity
           key={option}
           onPress={() => onSelect(option)}
-          className="flex-row items-center mr-6 mb-2"
-          style={{ minHeight: 44 }}
+          style={{ flexDirection: 'row', alignItems: 'center', marginRight: 24, marginBottom: 8, minHeight: 44 }}
           testID={`${testID}-${option}`}
           accessibilityLabel={`${label} ${option}`}
           accessibilityRole="radio"
           accessibilityState={{ selected: selected === option }}
         >
           <View
-            className={`w-5 h-5 border-2 rounded-full mr-2 ${selected === option ? "border-emerald-600" : "border-neutral-700"}`}
+            style={{
+              width: 20,
+              height: 20,
+              borderWidth: 2,
+              borderRadius: 10,
+              marginRight: 8,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderColor: selected === option ? '#8B5CF6' : '#E5E7EB',
+            }}
           >
             {selected === option && (
-              <View className="w-3 h-3 bg-emerald-600 rounded-full self-center mt-0.5" />
+              <View style={{ width: 10, height: 10, backgroundColor: '#8B5CF6', borderRadius: 5 }} />
             )}
           </View>
-          <Text className="text-white text-sm">{option}</Text>
+          <Text style={{ fontSize: 14, color: '#374151' }}>{option}</Text>
         </TouchableOpacity>
       ))}
     </View>
   </View>
 );
 
-const SectionCard = ({ title, children, className = "" }) => (
+const SectionCard = ({ title, children }) => (
   <View
-    className={`bg-neutral-900 border border-neutral-700 rounded-lg p-4 mb-4 ${className}`}
+    style={{
+      backgroundColor: 'white',
+      borderRadius: 20,
+      padding: 18,
+      marginBottom: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.07,
+      shadowRadius: 10,
+      elevation: 4,
+    }}
   >
-    <Text className="text-white text-lg font-bold mb-4 text-center border-b border-neutral-700 pb-2">
+    <Text
+      style={{
+        fontSize: 11,
+        fontWeight: '800',
+        color: '#8B5CF6',
+        letterSpacing: 1.2,
+        marginBottom: 16,
+        textAlign: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: '#F3F4F6',
+        paddingBottom: 10,
+      }}
+    >
       {title}
     </Text>
     {children}
   </View>
 );
 
-const TableRow = ({ children, isHeader = false }) => (
+const TableRow = ({ children, isHeader = false, isEven = false }) => (
   <View
-    className={`flex-row border-b border-neutral-700 py-2 ${isHeader ? "bg-neutral-800" : ""}`}
+    style={{
+      flexDirection: 'row',
+      borderBottomWidth: 1,
+      borderBottomColor: '#E5E7EB',
+      paddingVertical: 8,
+      backgroundColor: isHeader ? '#F5F3FF' : isEven ? '#FAFAFA' : 'white',
+    }}
   >
     {children}
   </View>
 );
 
-const TableCell = ({ children, flex = 1, className = "" }) => (
-  <View className={`px-2 ${className}`} style={{ flex }}>
+const TableCell = ({ children, flex = 1 }) => (
+  <View style={{ flex, paddingHorizontal: 8 }}>
     {children}
   </View>
 );
@@ -488,18 +532,30 @@ export default function AntenatalCardForm() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1 bg-neutral-950"
+      style={{ flex: 1, backgroundColor: '#FAFAFA' }}
     >
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        <View className="p-4">
-          {/* Header */}
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+
+        {/* Header */}
+        <View style={{ paddingTop: 60, paddingBottom: 20, paddingHorizontal: 20, backgroundColor: 'white', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 4 }}>
+          <TouchableOpacity onPress={() => router.back()} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <Ionicons name="arrow-back" size={20} color="#374151" />
+            <Text style={{ color: '#6B7280', fontSize: 13 }}>Back</Text>
+          </TouchableOpacity>
+          <Text style={{ fontSize: 26, fontWeight: '800', color: '#111827', letterSpacing: -0.5 }}>Antenatal Card</Text>
+          <Text style={{ fontSize: 13, color: '#9CA3AF', marginTop: 4 }}>Comprehensive antenatal record</Text>
+        </View>
+
+        <View style={{ padding: 16 }}>
+
+          {/* Header Card */}
           <SectionCard title="ANTENATAL CARD">
-            <View className="flex-row justify-between mb-4">
-              <Text className="text-white text-sm">Dr. Mariam Iqbal</Text>
-              <Text className="text-white text-sm">Dr. Saba Ansari</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 }}>
+              <Text style={{ fontSize: 14, color: '#374151' }}>Dr. Mariam Iqbal</Text>
+              <Text style={{ fontSize: 14, color: '#374151' }}>Dr. Saba Ansari</Text>
             </View>
 
-            <View className="flex-row justify-between">
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <TextInputField
                 label="Ref"
                 style={{ flex: 1, marginRight: 8 }}
@@ -528,8 +584,8 @@ export default function AntenatalCardForm() {
               testID="patient-name"
             />
 
-            <View className="flex-row mb-4">
-              <View className="flex-1 mr-2">
+            <View style={{ flexDirection: 'row', marginBottom: 16 }}>
+              <View style={{ flex: 1, marginRight: 8 }}>
                 <RadioGroup
                   label="Guardian Type"
                   options={["W/O", "D/O"]}
@@ -548,7 +604,7 @@ export default function AntenatalCardForm() {
               />
             </View>
 
-            <View className="flex-row">
+            <View style={{ flexDirection: 'row' }}>
               <TextInputField
                 label="Age"
                 required
@@ -567,7 +623,7 @@ export default function AntenatalCardForm() {
                 onChangeText={(value) => updateFormData("marriedSince", value)}
                 testID="married-since"
               />
-              <View className="flex-1 ml-4">
+              <View style={{ flex: 1, marginLeft: 16 }}>
                 <RadioGroup
                   label="Cousin Marriage"
                   options={["Yes", "No"]}
@@ -578,7 +634,7 @@ export default function AntenatalCardForm() {
               </View>
             </View>
 
-            <View className="flex-row">
+            <View style={{ flexDirection: 'row' }}>
               <TextInputField
                 label="P"
                 style={{ flex: 1, marginRight: 8 }}
@@ -595,7 +651,7 @@ export default function AntenatalCardForm() {
               />
             </View>
 
-            <View className="flex-row">
+            <View style={{ flexDirection: 'row' }}>
               <TextInputField
                 label="Tel"
                 required
@@ -615,7 +671,7 @@ export default function AntenatalCardForm() {
               />
             </View>
 
-            <View className="flex-row">
+            <View style={{ flexDirection: 'row' }}>
               <TextInputField
                 label="Husband Name"
                 style={{ flex: 1, marginRight: 8 }}
@@ -634,7 +690,7 @@ export default function AntenatalCardForm() {
               />
             </View>
 
-            <View className="flex-row">
+            <View style={{ flexDirection: 'row' }}>
               <TextInputField
                 label="Patient Occupation"
                 style={{ flex: 1, marginRight: 8 }}
@@ -669,45 +725,45 @@ export default function AntenatalCardForm() {
 
           {/* OB/H Table */}
           <SectionCard title="OB/H">
-            <View className="border border-neutral-700 rounded-lg overflow-hidden">
+            <View style={{ borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 12, overflow: 'hidden' }}>
               <TableRow isHeader>
                 <TableCell>
-                  <Text className="text-white text-xs font-bold text-center">
+                  <Text style={{ color: '#8B5CF6', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
                     Yrs
                   </Text>
                 </TableCell>
                 <TableCell>
-                  <Text className="text-white text-xs font-bold text-center">
+                  <Text style={{ color: '#8B5CF6', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
                     Term
                   </Text>
                 </TableCell>
                 <TableCell>
-                  <Text className="text-white text-xs font-bold text-center">
+                  <Text style={{ color: '#8B5CF6', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
                     MOD
                   </Text>
                 </TableCell>
                 <TableCell flex={2}>
-                  <Text className="text-white text-xs font-bold text-center">
+                  <Text style={{ color: '#8B5CF6', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
                     Complications
                   </Text>
                 </TableCell>
                 <TableCell>
-                  <Text className="text-white text-xs font-bold text-center">
+                  <Text style={{ color: '#8B5CF6', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
                     Gender & Weight
                   </Text>
                 </TableCell>
                 <TableCell>
-                  <Text className="text-white text-xs font-bold text-center">
+                  <Text style={{ color: '#8B5CF6', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
                     Status
                   </Text>
                 </TableCell>
               </TableRow>
 
               {obhRows.map((row, index) => (
-                <TableRow key={index}>
+                <TableRow key={index} isEven={index % 2 === 1}>
                   <TableCell>
                     <TextInput
-                      className="text-white text-xs bg-transparent"
+                      style={{ color: '#111827', fontSize: 12, backgroundColor: 'transparent' }}
                       value={row.yrs}
                       onChangeText={(value) =>
                         updateObhRow(index, "yrs", value)
@@ -717,7 +773,7 @@ export default function AntenatalCardForm() {
                   </TableCell>
                   <TableCell>
                     <TextInput
-                      className="text-white text-xs bg-transparent"
+                      style={{ color: '#111827', fontSize: 12, backgroundColor: 'transparent' }}
                       value={row.term}
                       onChangeText={(value) =>
                         updateObhRow(index, "term", value)
@@ -727,7 +783,7 @@ export default function AntenatalCardForm() {
                   </TableCell>
                   <TableCell>
                     <TextInput
-                      className="text-white text-xs bg-transparent"
+                      style={{ color: '#111827', fontSize: 12, backgroundColor: 'transparent' }}
                       value={row.mod}
                       onChangeText={(value) =>
                         updateObhRow(index, "mod", value)
@@ -737,7 +793,7 @@ export default function AntenatalCardForm() {
                   </TableCell>
                   <TableCell flex={2}>
                     <TextInput
-                      className="text-white text-xs bg-transparent"
+                      style={{ color: '#111827', fontSize: 12, backgroundColor: 'transparent' }}
                       value={row.complications}
                       onChangeText={(value) =>
                         updateObhRow(index, "complications", value)
@@ -747,7 +803,7 @@ export default function AntenatalCardForm() {
                   </TableCell>
                   <TableCell>
                     <TextInput
-                      className="text-white text-xs bg-transparent"
+                      style={{ color: '#111827', fontSize: 12, backgroundColor: 'transparent' }}
                       value={row.genderWeight}
                       onChangeText={(value) =>
                         updateObhRow(index, "genderWeight", value)
@@ -757,7 +813,7 @@ export default function AntenatalCardForm() {
                   </TableCell>
                   <TableCell>
                     <TextInput
-                      className="text-white text-xs bg-transparent"
+                      style={{ color: '#111827', fontSize: 12, backgroundColor: 'transparent' }}
                       value={row.status}
                       onChangeText={(value) =>
                         updateObhRow(index, "status", value)
@@ -771,18 +827,27 @@ export default function AntenatalCardForm() {
 
             <TouchableOpacity
               onPress={addObhRow}
-              className="flex-row items-center justify-center mt-3 py-2 px-4 bg-emerald-700 rounded-lg"
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 12,
+                paddingVertical: 8,
+                paddingHorizontal: 16,
+                backgroundColor: '#8B5CF6',
+                borderRadius: 10,
+              }}
               testID="add-obh-row"
             >
               <Plus size={16} color="white" />
-              <Text className="text-white ml-2 text-sm">Add Row</Text>
+              <Text style={{ color: 'white', marginLeft: 8, fontSize: 14 }}>Add Row</Text>
             </TouchableOpacity>
           </SectionCard>
 
           {/* Gynae History */}
           <SectionCard title="GYNAE HISTORY">
-            <View className="flex-row flex-wrap">
-              <View className="w-1/2">
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+              <View style={{ width: '50%' }}>
                 <Checkbox
                   checked={checkboxStates.regular}
                   onToggle={() => toggleCheckbox("regular")}
@@ -802,7 +867,7 @@ export default function AntenatalCardForm() {
                   testID="pco-checkbox"
                 />
               </View>
-              <View className="w-1/2">
+              <View style={{ width: '50%' }}>
                 <Checkbox
                   checked={checkboxStates.hirsutism}
                   onToggle={() => toggleCheckbox("hirsutism")}
@@ -824,14 +889,14 @@ export default function AntenatalCardForm() {
               </View>
             </View>
 
-            <Text className="text-white text-sm mb-1 font-medium mt-4">
+            <Text style={{ fontSize: 14, fontWeight: '700', color: '#374151', marginBottom: 4, marginTop: 16 }}>
               M/C
             </Text>
           </SectionCard>
 
           {/* LMP & EDD */}
           <SectionCard title="LMP & EDD">
-            <View className="flex-row">
+            <View style={{ flexDirection: 'row' }}>
               <TextInputField
                 label="LMP"
                 required
@@ -855,8 +920,8 @@ export default function AntenatalCardForm() {
 
           {/* Family History */}
           <SectionCard title="F/H">
-            <View className="flex-row">
-              <View className="flex-1 mr-4">
+            <View style={{ flexDirection: 'row' }}>
+              <View style={{ flex: 1, marginRight: 16 }}>
                 <Checkbox
                   checked={checkboxStates.dm}
                   onToggle={() => toggleCheckbox("dm")}
@@ -876,7 +941,7 @@ export default function AntenatalCardForm() {
                   testID="fh-cancer-checkbox"
                 />
               </View>
-              <View className="flex-1">
+              <View style={{ flex: 1 }}>
                 <Checkbox
                   checked={checkboxStates.twins}
                   onToggle={() => toggleCheckbox("twins")}
@@ -912,8 +977,8 @@ export default function AntenatalCardForm() {
 
           {/* Medical History */}
           <SectionCard title="MEDICAL Hx">
-            <View className="flex-row flex-wrap">
-              <View className="w-1/2">
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+              <View style={{ width: '50%' }}>
                 <Checkbox
                   checked={checkboxStates.drugAllergy}
                   onToggle={() => toggleCheckbox("drugAllergy")}
@@ -933,7 +998,7 @@ export default function AntenatalCardForm() {
                   testID="htn-medical-checkbox"
                 />
               </View>
-              <View className="w-1/2">
+              <View style={{ width: '50%' }}>
                 <Checkbox
                   checked={checkboxStates.dmMedical}
                   onToggle={() => toggleCheckbox("dmMedical")}
@@ -978,7 +1043,7 @@ export default function AntenatalCardForm() {
 
           {/* Vitals & Examination */}
           <SectionCard title="VITALS & EXAMINATION">
-            <View className="flex-row mb-4">
+            <View style={{ flexDirection: 'row', marginBottom: 16 }}>
               <TextInputField
                 label="Height (cm)"
                 keyboardType="numeric"
@@ -999,10 +1064,10 @@ export default function AntenatalCardForm() {
                 }
                 testID="weight"
               />
-              <View style={{ flex: 1, marginLeft: 8 }} className="mb-3">
-                <Text className="text-white text-sm mb-1 font-medium">BMI</Text>
-                <View className="rounded-xl border border-neutral-700 bg-neutral-700 px-3 h-11 justify-center">
-                  <Text className="text-neutral-400 text-sm">
+              <View style={{ flex: 1, marginLeft: 8, marginBottom: 12 }}>
+                <Text style={{ fontSize: 12, fontWeight: '700', color: '#374151', marginBottom: 6 }}>BMI</Text>
+                <View style={{ backgroundColor: '#F5F3FF', borderRadius: 12, paddingHorizontal: 12, height: 44, justifyContent: 'center' }}>
+                  <Text style={{ color: '#8B5CF6', fontSize: 14, fontWeight: '600' }}>
                     {bmi || "Auto-calc"}
                   </Text>
                 </View>
@@ -1021,8 +1086,8 @@ export default function AntenatalCardForm() {
 
           {/* Scans */}
           <SectionCard title="SCANS">
-            <View className="flex-row flex-wrap">
-              <View className="w-1/2">
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+              <View style={{ width: '50%' }}>
                 <Checkbox
                   checked={checkboxStates.bookingScan}
                   onToggle={() => toggleCheckbox("bookingScan")}
@@ -1042,7 +1107,7 @@ export default function AntenatalCardForm() {
                   testID="anomaly-scan-checkbox"
                 />
               </View>
-              <View className="w-1/2">
+              <View style={{ width: '50%' }}>
                 <Checkbox
                   checked={checkboxStates.scan28Weeks}
                   onToggle={() => toggleCheckbox("scan28Weeks")}
@@ -1064,7 +1129,7 @@ export default function AntenatalCardForm() {
               </View>
             </View>
 
-            <View className="flex-row mt-4">
+            <View style={{ flexDirection: 'row', marginTop: 16 }}>
               <TextInputField
                 label="EDD"
                 placeholder="DD/MM/YYYY"
@@ -1086,7 +1151,7 @@ export default function AntenatalCardForm() {
               />
             </View>
 
-            <View className="flex-row">
+            <View style={{ flexDirection: 'row' }}>
               <TextInputField
                 label="P/S"
                 style={{ flex: 1, marginRight: 8 }}
@@ -1110,45 +1175,45 @@ export default function AntenatalCardForm() {
 
           {/* Investigations Table */}
           <SectionCard title="INVESTIGATIONS">
-            <View className="border border-neutral-700 rounded-lg overflow-hidden">
+            <View style={{ borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 12, overflow: 'hidden' }}>
               <TableRow isHeader>
                 <TableCell flex={1.5}>
-                  <Text className="text-white text-xs font-bold text-center">
+                  <Text style={{ color: '#8B5CF6', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
                     Test
                   </Text>
                 </TableCell>
                 <TableCell>
-                  <Text className="text-white text-xs font-bold text-center">
+                  <Text style={{ color: '#8B5CF6', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
                     Date
                   </Text>
                 </TableCell>
                 <TableCell>
-                  <Text className="text-white text-s font-bold text-center">
+                  <Text style={{ color: '#8B5CF6', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
                     Hb
                   </Text>
                 </TableCell>
                 <TableCell>
-                  <Text className="text-white text-s font-bold text-center">
+                  <Text style={{ color: '#8B5CF6', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
                     BSR
                   </Text>
                 </TableCell>
                 <TableCell>
-                  <Text className="text-white text-xs font-bold text-center">
+                  <Text style={{ color: '#8B5CF6', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
                     Urine
                   </Text>
                 </TableCell>
                 <TableCell flex={1.5}>
-                  <Text className="text-white text-xs font-bold text-center">
+                  <Text style={{ color: '#8B5CF6', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
                     Ultrasound
                   </Text>
                 </TableCell>
               </TableRow>
 
               {investigationRows.map((row, index) => (
-                <TableRow key={index}>
+                <TableRow key={index} isEven={index % 2 === 1}>
                   <TableCell flex={1.5}>
                     <TextInput
-                      className="text-white text-xs bg-transparent"
+                      style={{ color: '#111827', fontSize: 12, backgroundColor: 'transparent' }}
                       value={row.test}
                       onChangeText={(value) =>
                         updateInvestigationRow(index, "test", value)
@@ -1159,9 +1224,10 @@ export default function AntenatalCardForm() {
                   </TableCell>
                   <TableCell>
                     <TextInput
-                      className="text-white text-s bg-transparent"
+                      style={{ color: '#111827', fontSize: 12, backgroundColor: 'transparent' }}
                       value={row.date}
                       placeholder="DD/MM"
+                      placeholderTextColor="#9CA3AF"
                       onChangeText={(value) =>
                         updateInvestigationRow(index, "date", value)
                       }
@@ -1170,7 +1236,7 @@ export default function AntenatalCardForm() {
                   </TableCell>
                   <TableCell>
                     <TextInput
-                      className="text-white text-xs bg-transparent"
+                      style={{ color: '#111827', fontSize: 12, backgroundColor: 'transparent' }}
                       value={row.hb}
                       onChangeText={(value) =>
                         updateInvestigationRow(index, "hb", value)
@@ -1180,7 +1246,7 @@ export default function AntenatalCardForm() {
                   </TableCell>
                   <TableCell>
                     <TextInput
-                      className="text-white text-xs bg-transparent"
+                      style={{ color: '#111827', fontSize: 12, backgroundColor: 'transparent' }}
                       value={row.bsr}
                       onChangeText={(value) =>
                         updateInvestigationRow(index, "bsr", value)
@@ -1190,7 +1256,7 @@ export default function AntenatalCardForm() {
                   </TableCell>
                   <TableCell>
                     <TextInput
-                      className="text-white text-xs bg-transparent"
+                      style={{ color: '#111827', fontSize: 12, backgroundColor: 'transparent' }}
                       value={row.urine}
                       onChangeText={(value) =>
                         updateInvestigationRow(index, "urine", value)
@@ -1200,7 +1266,7 @@ export default function AntenatalCardForm() {
                   </TableCell>
                   <TableCell flex={1.5}>
                     <TextInput
-                      className="text-white text-xs bg-transparent"
+                      style={{ color: '#111827', fontSize: 12, backgroundColor: 'transparent' }}
                       value={row.ultrasound}
                       onChangeText={(value) =>
                         updateInvestigationRow(index, "ultrasound", value)
@@ -1214,11 +1280,20 @@ export default function AntenatalCardForm() {
 
             <TouchableOpacity
               onPress={addInvestigationRow}
-              className="flex-row items-center justify-center mt-3 py-2 px-4 bg-emerald-700 rounded-lg"
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 12,
+                paddingVertical: 8,
+                paddingHorizontal: 16,
+                backgroundColor: '#8B5CF6',
+                borderRadius: 10,
+              }}
               testID="add-investigation-row"
             >
               <Plus size={16} color="white" />
-              <Text className="text-white ml-2 text-sm">Add Investigation</Text>
+              <Text style={{ color: 'white', marginLeft: 8, fontSize: 14 }}>Add Investigation</Text>
             </TouchableOpacity>
           </SectionCard>
 
@@ -1254,31 +1329,46 @@ export default function AntenatalCardForm() {
           </SectionCard>
 
           {/* Action Buttons */}
-          <View className="flex-row justify-between mb-8">
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 32 }}>
             <TouchableOpacity
               onPress={handleSave}
-              className="flex-1 bg-emerald-700 rounded-xl py-4 px-6 mr-2"
-              style={{ minHeight: 44 }}
+              style={{
+                flex: 1,
+                backgroundColor: '#8B5CF6',
+                borderRadius: 14,
+                paddingVertical: 16,
+                paddingHorizontal: 24,
+                marginRight: 8,
+                minHeight: 44,
+              }}
               testID="save-button"
               accessibilityLabel="Save antenatal card"
             >
-              <Text className="text-white text-center font-semibold text-lg">
+              <Text style={{ color: 'white', textAlign: 'center', fontWeight: '700', fontSize: 16 }}>
                 Save Draft
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={handleExportPDF}
-              className="flex-1 bg-neutral-700 rounded-xl py-4 px-6 ml-2"
-              style={{ minHeight: 44 }}
+              style={{
+                flex: 1,
+                backgroundColor: '#F3F4F6',
+                borderRadius: 14,
+                paddingVertical: 16,
+                paddingHorizontal: 24,
+                marginLeft: 8,
+                minHeight: 44,
+              }}
               testID="export-button"
               accessibilityLabel="Export as PDF"
             >
-              <Text className="text-white text-center font-semibold text-lg">
+              <Text style={{ color: '#374151', textAlign: 'center', fontWeight: '700', fontSize: 16 }}>
                 Export PDF
               </Text>
             </TouchableOpacity>
           </View>
+
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

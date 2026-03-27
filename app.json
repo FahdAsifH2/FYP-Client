@@ -18,7 +18,9 @@
       },
       "edgeToEdgeEnabled": true,
       "permissions": [
-        "android.permission.ACTIVITY_RECOGNITION"
+        "android.permission.ACTIVITY_RECOGNITION",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.SCHEDULE_EXACT_ALARM"
       ]
     },
     "web": {
@@ -39,6 +41,14 @@
       ],
       "expo-asset",
       "@react-native-community/datetimepicker",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#ec4899",
+          "sounds": []
+        }
+      ],
       "expo-font",
       "expo-web-browser"
     ],

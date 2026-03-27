@@ -1,3 +1,35 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ── GynAI Maternal Health Design Tokens ──────────────────────────────────
+   These variables define the app's unified color palette.
+   In React Native inline styles, import from app/theme.js (mirrors these).
+   ──────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Brand rose — hero elements, primary CTAs, pregnancy tracker */
+  --gynai-pink:         #ec4899;
+  --gynai-pink-dark:    #be185d;
+  --gynai-pink-light:   #f9a8d4;
+  --gynai-pink-bg:      #fdf2f8;
+  --gynai-pink-border:  #fbcfe8;
+
+  /* Sage green — wellness, water, sleep, health tools */
+  --gynai-sage:         #5b9279;
+  --gynai-sage-bg:      #edf5f1;
+  --gynai-sage-dark:    #3d6b54;
+
+  /* Page surfaces */
+  --gynai-page:         #faf6f8;
+  --gynai-card:         #ffffff;
+  --gynai-surface:      #f5f0f3;
+
+  /* Typography */
+  --gynai-text:         #1f1724;
+  --gynai-subtle:       #6b7280;
+  --gynai-muted:        #a1a1aa;
+
+  /* Emergency */
+  --gynai-emergency-bg: #fef2f2;
+  --gynai-emergency:    #dc2626;
+}

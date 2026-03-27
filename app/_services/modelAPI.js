@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { config } from '../config/config';
+import { config } from '../_config/config';
 
 // Configuration for your FastAPI model backend
 const MODEL_API_BASE_URL = config.FASTAPI_MODEL_URL;

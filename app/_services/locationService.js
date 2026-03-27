@@ -95,8 +95,20 @@ static async getCurrentLocation() {
         headers: { 'Content-Type': 'text/plain' }
       });
 
-      const data = await response.json();
-      
+      if (!response.ok) {
+        console.warn('Overpass API error for pharmacies:', response.status);
+        return this.searchNominatimPharmacies(latitude, longitude, radius);
+      }
+
+      const text = await response.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        console.warn('Overpass returned non-JSON for pharmacies, falling back to Nominatim');
+        return this.searchNominatimPharmacies(latitude, longitude, radius);
+      }
+
       const pharmacies = data.elements
         .filter(element => {
     
@@ -180,8 +192,20 @@ static async getCurrentLocation() {
         headers: { 'Content-Type': 'text/plain' }
       });
 
-      const data = await response.json();
-      
+      if (!response.ok) {
+        console.warn('Overpass API error for hospitals:', response.status);
+        return this.searchNominatimHospitals(latitude, longitude, radius);
+      }
+
+      const text = await response.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        console.warn('Overpass returned non-JSON for hospitals, falling back to Nominatim');
+        return this.searchNominatimHospitals(latitude, longitude, radius);
+      }
+
       const hospitals = data.elements
         .filter(element => {
           if (!element.lat && !element.lon) return false;

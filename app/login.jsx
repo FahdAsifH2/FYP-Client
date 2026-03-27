@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { router } from 'expo-router';
-import { useAuth } from './contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { useAuth } from './_contexts/AuthContext';
 
 export default function LoginScreen() {
     const { login, loading } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -55,13 +56,22 @@ export default function LoginScreen() {
 
             <View className="mb-8">
                 <Text className="text-sm font-medium text-gynai-gray-700 mb-2">Password</Text>
-                <TextInput
-                    className="w-full bg-white border border-gynai-gray-100 placeholder:text-gynai-gray-400 rounded-2xl px-5 py-4 text-gynai-gray-900 shadow-sm"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                />
+                <View style={{ position: 'relative' }}>
+                    <TextInput
+                        className="w-full bg-white border border-gynai-gray-100 placeholder:text-gynai-gray-400 rounded-2xl px-5 py-4 text-gynai-gray-900 shadow-sm"
+                        style={{ paddingRight: 50 }}
+                        placeholder="Enter your password"
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry={!showPassword}
+                    />
+                    <TouchableOpacity
+                        onPress={() => setShowPassword(p => !p)}
+                        style={{ position: 'absolute', right: 16, top: 0, bottom: 0, justifyContent: 'center' }}
+                    >
+                        <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9CA3AF" />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <TouchableOpacity

@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import Cards from '../components/cards';
+import Cards from '../_components/cards';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../_contexts/AuthContext';
 
 const Dashboard = () => {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   return (
     <View className="flex-1 bg-gray-50">
       {/* Header */}
@@ -32,7 +32,7 @@ const Dashboard = () => {
       {/* Welcome Section */}
       <View className="px-6 py-4 bg-white mb-2">
         <Text className="text-lg text-gynai-gray-600">
-          Welcome back, Dr. XYZ
+          Welcome back, Dr. {user?.name || 'Doctor'}
         </Text>
         <Text className="text-sm text-gynai-gray-500 mt-1">
           Manage your patients and medical records
@@ -43,8 +43,38 @@ const Dashboard = () => {
       <ScrollView className="flex-1 px-6 py-4" showsVerticalScrollIndicator={false}>
         <View className="space-y-4">
           <Cards
+            Title="My Patients"
+            Description="View your connected patients, their documents, and manage their care from one place."
+            onPress={() => router.push('/DoctorScreens/MyPatients')}
+            icon="people"
+            iconColor="pink-500"
+          />
+
+          <View className="h-4" />
+
+          <Cards
+            Title="Manage Appointments"
+            Description="View, confirm, and manage patient appointments. Add notes after consultations."
+            onPress={() => router.push('/DoctorScreens/ManageAppointments')}
+            icon="calendar"
+            iconColor="blue-500"
+          />
+
+          <View className="h-4" />
+
+          <Cards
+            Title="Shared Documents"
+            Description="View clinical documents, lab reports, and scans shared by your patients."
+            onPress={() => router.push('/DoctorScreens/SharedDocuments')}
+            icon="documents"
+            iconColor="purple-500"
+          />
+
+          <View className="h-4" />
+
+          <Cards
             Title="Predict Delivery Mode"
-            Description="Use AI-powered analysis to predict the most likely delivery method for your patient based on medical history and current data."
+            Description="Use AI-powered analysis to predict delivery method based on medical history."
             onPress={() => router.push('/DoctorScreens/PredictDelivery')}
             icon="analytics"
             iconColor="primary-500"
@@ -53,31 +83,11 @@ const Dashboard = () => {
           <View className="h-4" />
 
           <Cards
-            Title="Appointment Schedule"
-            Description="View and manage your upcoming appointments. Check patient schedules and availability slots."
-            onPress={() => console.log("Navigation to the Appointments")}
-            icon="calendar"
-            iconColor="blue-500"
-          />
-
-          <View className="h-4" />
-
-          <Cards
-            Title="Patient Medical History"
-            Description="Access comprehensive medical histories and communicate directly with your patients through secure messaging."
+            Title="Antenatal Form"
+            Description="Fill comprehensive antenatal records for your patients."
             onPress={() => router.push('/DoctorScreens/AntenatalForm')}
             icon="document-text"
             iconColor="green-500"
-          />
-
-          <View className="h-4" />
-
-          <Cards
-            Title="Patient Medical Records"
-            Description="Browse through detailed medical records of your patients. Review test results, diagnoses, and treatment plans."
-            onPress={() => router.push('/DoctorScreens/Patients')}
-            icon="folder"
-            iconColor="orange-500"
           />
 
           <View className="h-8" />

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from './contexts/AuthContext';
+import { useAuth } from './_contexts/AuthContext';
 
 export default function ConfirmationScreen() {
     const router = useRouter();

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useHealth } from '../contexts/HealthContext';
+import { useHealth } from '../_contexts/HealthContext';
 
 const WaterTracker = () => {
   const { waterCount, updateWaterCount } = useHealth();
