@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
+import config from "../_config/config";
 import axios from "axios";
 const AppointmentBookingForm = () => {
   const [formData, setFormData] = useState({
@@ -55,7 +56,7 @@ const AppointmentBookingForm = () => {
 
       try {
         const response = await axios.post(
-          "http://192.168.31.188:5001/api/Doctors/GetTomorrowsAppointments",
+          `${config.API_URL}/api/Doctors/GetTomorrowsAppointments`,
           formData
         );
         console.log("Appointments Submitted");

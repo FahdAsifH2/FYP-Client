@@ -7,7 +7,74 @@ module.exports = {
   ],
   presets: [require("nativewind/preset")],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: {
+          50: '#fdf2f8',
+          100: '#fce7f3',
+          200: '#fbcfe8',
+          300: '#f9a8d4',
+          400: '#f472b6',
+          500: '#ec4899', // Main pink
+          600: '#db2777',
+          700: '#be185d',
+          800: '#9d174d',
+          900: '#831843',
+        },
+        gynai: {
+          // ── Brand pink (hero elements, primary CTA) ──────────────────
+          pink: '#ec4899',
+          'pink-light': '#f9a8d4',
+          'pink-dark': '#be185d',
+          'pink-bg': '#fdf2f8',    // tinted card background
+          'pink-border': '#fbcfe8',
+          // ── Sage green (wellness / health tools) ────────────────────
+          sage: '#5b9279',
+          'sage-bg': '#edf5f1',
+          'sage-dark': '#3d6b54',
+          // ── Page & card surfaces ─────────────────────────────────────
+          page: '#faf6f8',          // warm page background
+          card: '#ffffff',
+          surface: '#f5f0f3',       // muted section bg
+          // ── Text ─────────────────────────────────────────────────────
+          text: '#1f1724',          // deep warm dark
+          subtle: '#6b7280',
+          muted: '#a1a1aa',
+          // ── Emergency ────────────────────────────────────────────────
+          'emergency-bg': '#fef2f2',
+          'emergency': '#dc2626',
+          // ── Legacy purple (kept for backward compat) ─────────────────
+          purple: '#8b5cf6',
+          gray: {
+            50: '#f9fafb',
+            100: '#f3f4f6',
+            200: '#e5e7eb',
+            300: '#d1d5db',
+            400: '#9ca3af',
+            500: '#6b7280',
+            600: '#4b5563',
+            700: '#374151',
+            800: '#1f2937',
+            900: '#111827',
+          }
+        }
+      },
+      fontFamily: {
+        'inter': ['Inter', 'system-ui', 'sans-serif'],
+      },
+      borderRadius: {
+        'xl': '16px',
+        '2xl': '20px',
+        '3xl': '24px',
+      },
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+      },
+      shadowColor: {
+        pink: '#ec4899',
+      }
+    },
   },
   plugins: [],
 }
