@@ -15,18 +15,17 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
 
     // Load token from storage on app start
     useEffect(() => {
         const loadUser = async () => {
             try {
-                const token = await AsyncStorage.getItem("userToken");
-                if (token) {
-                    // Verify token and load user profile from API in a real app
-                    // Here we are just mocking a user load if token exists
-                    // Note: In production you'd use your /me endpoint here
-                    await fetchMe(token);
+                const storedToken = await AsyncStorage.getItem("userToken");
+                if (storedToken) {
+                    setToken(storedToken);
+                    await fetchMe(storedToken);
                 }
             } catch (error) {
                 console.error("Error loading auth token:", error);
@@ -59,8 +58,9 @@ export const AuthProvider = ({ children }) => {
             const res = await axios.post(`${config.API_URL}/api/auth/login`, { email, password });
 
             if (res.data && res.data.token) {
-                const { token, user } = res.data;
-                await AsyncStorage.setItem("userToken", token);
+                const { token: newToken, user } = res.data;
+                await AsyncStorage.setItem("userToken", newToken);
+                setToken(newToken);
                 setUser(user);
                 return { success: true };
             }
@@ -79,8 +79,9 @@ export const AuthProvider = ({ children }) => {
             const res = await axios.post(`${config.API_URL}/api/auth/register`, { name, email, password, role });
 
             if (res.data && res.data.token) {
-                const { token, user } = res.data;
-                await AsyncStorage.setItem("userToken", token);
+                const { token: newToken, user } = res.data;
+                await AsyncStorage.setItem("userToken", newToken);
+                setToken(newToken);
                 setUser(user);
                 return { success: true };
             }
@@ -97,6 +98,7 @@ export const AuthProvider = ({ children }) => {
         try {
             await AsyncStorage.removeItem("userToken");
             setUser(null);
+            setToken(null);
         } catch (error) {
             console.error("Logout error:", error);
         }
@@ -104,6 +106,7 @@ export const AuthProvider = ({ children }) => {
 
     const value = {
         user,
+        token,
         loading,
         login,
         register,

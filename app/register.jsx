@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from './_contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,7 +32,8 @@ export default function RegisterScreen() {
     };
 
     return (
-        <ScrollView className="flex-1 bg-gradient-to-br from-primary-50 via-white to-white" contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 40 }}>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <ScrollView className="flex-1 bg-gradient-to-br from-primary-50 via-white to-white" contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 40 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
             <TouchableOpacity
                 className="absolute top-16 left-6 z-10 w-10 h-10 bg-white rounded-full items-center justify-center shadow-sm"
                 onPress={() => router.replace('/')}
@@ -127,5 +128,6 @@ export default function RegisterScreen() {
                 </TouchableOpacity>
             </View>
         </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
