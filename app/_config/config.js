@@ -9,7 +9,9 @@ const isTunnel = debuggerHost && !debuggerHost.match(/^\d{1,3}\.\d{1,3}\.\d{1,3}
 // Backend IP — resolved from the packager when on LAN, hardcoded fallback otherwise.
 let backendIp = '192.168.100.105'; // fallback: Windows dev machine IP
 
-if (!isTunnel && debuggerHost) {
+if (Platform.OS === 'web') {
+  backendIp = 'localhost';
+} else if (!isTunnel && debuggerHost) {
   // Local mode: packager runs on the same machine as the backend
   backendIp = debuggerHost.split(':')[0];
 } else if (Platform.OS === 'android' && !debuggerHost) {
